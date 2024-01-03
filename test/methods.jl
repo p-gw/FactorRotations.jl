@@ -98,6 +98,31 @@ end
         @test isoblique(method)
     end
 
+    @testset "TargetRotation" begin
+        @test_throws ArgumentError criterion_and_gradient(TargetRotation([0 1; 1 0]), A)
+
+        # orthogonal + complete case
+        method = TargetRotation(similar(A), orthogonal = true)
+        @test isorthogonal(method)
+        test_criterion_and_gradient(method, A)
+
+        # orthogonal + partial specification
+        target = [missing 1; 0 1; 0 1; 0 1; 1 0; 1 0; 1 0; 1 0]
+        method = TargetRotation(target, orthogonal = true)
+        @test isorthogonal(method)
+        test_criterion_and_gradient(method, A)
+
+        # oblique + complete case
+        method = TargetRotation(similar(A), orthogonal = false)
+        @test isoblique(method)
+        test_criterion_and_gradient(method, A)
+
+        # oblique + partial specification
+        method = TargetRotation(target, orthogonal = false)
+        @test isoblique(method)
+        test_criterion_and_gradient(method, A)
+    end
+
     @testset "Quartimax" begin
         method = Quartimax()
         @test isorthogonal(method)

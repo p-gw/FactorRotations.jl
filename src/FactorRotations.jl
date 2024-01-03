@@ -17,8 +17,7 @@ export Infomax
 export MinimumEntropy
 export MinimumEntropyRatio
 export Oblimax
-
-
+export TargetRotation
 export Oblimin
 export Quartimax
 export Varimax
