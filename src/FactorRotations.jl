@@ -2,6 +2,7 @@ module FactorRotations
 
 using FillArrays
 using LinearAlgebra
+using LogExpFunctions
 using SimpleUnPack
 
 export rotate, rotate!
@@ -15,6 +16,7 @@ export CrawfordFerguson
 export Oblimin
 export Quartimax
 export Varimax
+export Infomax
 
 include("utils.jl")
 include("rotation_types.jl")

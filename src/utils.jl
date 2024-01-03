@@ -4,3 +4,5 @@ function zerodiag!(x)
     end
     return x
 end
+
+mxlogx(x) = -xlogx(x)

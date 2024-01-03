@@ -51,6 +51,18 @@ end
         test_criterion_and_gradient(method, A)
     end
 
+    @testset "Infomax" begin
+        # orthogonal case
+        method = Infomax(orthogonal = true)
+        @test isorthogonal(method)
+        test_criterion_and_gradient(method, A)
+
+        # oblique case
+        method = Infomax(orthogonal = false)
+        @test isoblique(method)
+        test_criterion_and_gradient(method, A)
+    end
+
     @testset "MinimumEntropy" begin
 
     end
