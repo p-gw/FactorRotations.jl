@@ -4,6 +4,7 @@ using FillArrays
 using LinearAlgebra
 using LogExpFunctions
 using SimpleUnPack
+using Statistics
 
 export rotate, rotate!
 export criterion_and_gradient
