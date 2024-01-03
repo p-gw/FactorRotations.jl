@@ -64,7 +64,15 @@ end
     end
 
     @testset "MinimumEntropy" begin
+        method = MinimumEntropy()
+        @test isorthogonal(method)
+        test_criterion_and_gradient(method, A)
+    end
 
+    @testset "MinimumEntropyRatio" begin
+        method = MinimumEntropyRatio()
+        @test isorthogonal(method)
+        test_criterion_and_gradient(method, A)
     end
 
     @testset "Oblimin" begin

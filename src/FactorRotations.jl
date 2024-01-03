@@ -17,6 +17,8 @@ export Oblimin
 export Quartimax
 export Varimax
 export Infomax
+export MinimumEntropy
+export MinimumEntropyRatio
 
 include("utils.jl")
 include("rotation_types.jl")
