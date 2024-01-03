@@ -13,12 +13,15 @@ export isorthogonal, isoblique
 
 export Biquartimax
 export CrawfordFerguson
-export Oblimin
-export Quartimax
-export Varimax
 export Infomax
 export MinimumEntropy
 export MinimumEntropyRatio
+export Oblimax
+
+
+export Oblimin
+export Quartimax
+export Varimax
 
 include("utils.jl")
 include("rotation_types.jl")

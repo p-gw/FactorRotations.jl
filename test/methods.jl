@@ -75,6 +75,18 @@ end
         test_criterion_and_gradient(method, A)
     end
 
+    @testset "Oblimax" begin
+        # orthogonal case
+        method = Oblimax(orthogonal = true)
+        @test isorthogonal(method)
+        test_criterion_and_gradient(method, A)
+
+        # Oblimax is equivalent to Quartimax in the orthogonal case
+        oblimax = rotate(A, method)
+        quartimax = rotate(A, Quartimax())
+        @test isapprox(oblimax, quartimax, atol = 1e-6)
+    end
+
     @testset "Oblimin" begin
         # orthogonal case
         method = Oblimin(gamma = 0.5, orthogonal = true)
