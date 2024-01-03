@@ -1,4 +1,5 @@
 using FactorRotations
+using LinearAlgebra
 using Test
 
 A = [
@@ -12,6 +13,9 @@ A = [
     0.647 0.333
 ];
 
+init = Matrix{Float64}(I, 2, 2)
+
 @testset "FactorRotations.jl" begin
     include("methods.jl")
+    include("rotate.jl")
 end
