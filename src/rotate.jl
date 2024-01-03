@@ -11,10 +11,12 @@ Perform a rotation of the factor loading matrix `Λ`.
 - `init`: A k-by-k matrix of starting values for the algorithm.
           If `init = nothing` (the default), random starting values will be generated.
 """
-rotate(args...; kwargs...) = _rotate(args...; kwargs...)
+function rotate(A, args...; kwargs...)
+    L = copy(A)
+    return rotate!(L, args...; kwargs...)
+end
 
-# https://citeseerx.ist.psu.edu/document?repid=rep1&type=pdf&doi=f448431f1d1e2179cf1db64b86b03cc9bbe2ab2f
-function _rotate(
+function rotate!(
     A::AbstractMatrix{TV},
     method::RotationMethod{Orthogonal};
     atol = 1e-6,
@@ -78,5 +80,6 @@ function _rotate(
           criterion: $(ft)
     """
 
-    return L
+    A .= L
+    return A
 end
