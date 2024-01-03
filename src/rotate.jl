@@ -8,7 +8,7 @@ Perform a rotation of the factor loading matrix `Λ`.
 - `alpha`:
 - `maxiter1`:
 - `maxiter2`:
-- `init`: A p-by-p matrix of starting values for the algorithm.
+- `init`: A k-by-k matrix of starting values for the algorithm.
           If `init = nothing` (the default), random starting values will be generated.
 """
 rotate(args...; kwargs...) = _rotate(args...; kwargs...)
@@ -21,15 +21,17 @@ function _rotate(
     alpha = 1,
     maxiter1 = 1000,
     maxiter2 = 10,
-    init = nothing,
+    init::Union{Nothing,AbstractMatrix} = nothing,
 ) where {TV<:Real}
+    p, k = size(A)
+
     if isnothing(init)
-        p = size(A, 2)
-        T = qr(rand(TV, p, p)).Q
+        T = Matrix(qr(rand(TV, k, k)).Q)
     else
+        size(init) == (k, k) ||
+            throw(ArgumentError("matrix of starting values must be of size ($k, $k)"))
         T = init
     end
-    T = Matrix{Float64}(I, size(A, 2), size(A, 2))
 
     L = A * T
     Q, ∇Q = criterion_and_gradient(method, L)

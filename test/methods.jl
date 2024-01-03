@@ -14,7 +14,8 @@ end
         test_criterion_and_gradient(method, A)
 
         # Biquartimax is a special case of Oblimin
-        @test rotate(A, Biquartimax()) ≈ rotate(A, Oblimin(gamma = 0.5, orthogonal = true))
+        @test rotate(A, Biquartimax(); init) ≈
+              rotate(A, Oblimin(gamma = 0.5, orthogonal = true); init)
     end
 
     @testset "CrawfordFerguson" begin
@@ -29,17 +30,17 @@ end
         # for the orthogonal case, Crawford-Ferguson and Oblimin are equivalent
         p, k = size(A)
 
-        @test rotate(A, CrawfordFerguson(kappa = 0, orthogonal = true)) ≈
-              rotate(A, Quartimax())
+        @test rotate(A, CrawfordFerguson(kappa = 0, orthogonal = true); init) ≈
+              rotate(A, Quartimax(); init)
 
-        @test rotate(A, CrawfordFerguson(kappa = 0, orthogonal = true)) ≈
-              rotate(A, Oblimin(gamma = 0, orthogonal = true))
+        @test rotate(A, CrawfordFerguson(kappa = 0, orthogonal = true); init) ≈
+              rotate(A, Oblimin(gamma = 0, orthogonal = true); init)
 
-        @test rotate(A, CrawfordFerguson(kappa = 1 / p, orthogonal = true)) ≈
-              rotate(A, Varimax())
+        @test rotate(A, CrawfordFerguson(kappa = 1 / p, orthogonal = true); init) ≈
+              rotate(A, Varimax(); init)
 
-        @test rotate(A, CrawfordFerguson(kappa = 1 / p, orthogonal = true)) ≈
-              rotate(A, Oblimin(gamma = 1, orthogonal = true))
+        @test rotate(A, CrawfordFerguson(kappa = 1 / p, orthogonal = true); init) ≈
+              rotate(A, Oblimin(gamma = 1, orthogonal = true); init)
 
         # TODO: Equamax: kappa = k/2p
         # TODO: Parsimax: kappa = (k - 1)/(p + k - 2)
@@ -82,8 +83,8 @@ end
         test_criterion_and_gradient(method, A)
 
         # Oblimax is equivalent to Quartimax in the orthogonal case
-        oblimax = rotate(A, method)
-        quartimax = rotate(A, Quartimax())
+        oblimax = rotate(A, method; init)
+        quartimax = rotate(A, Quartimax(); init)
         @test isapprox(oblimax, quartimax, atol = 1e-6)
     end
 
@@ -129,7 +130,8 @@ end
         test_criterion_and_gradient(method, A)
 
         # Quartimax is a special case of Oblimin
-        @test rotate(A, Quartimax()) ≈ rotate(A, Oblimin(gamma = 0, orthogonal = true))
+        @test rotate(A, Quartimax(); init) ≈
+              rotate(A, Oblimin(gamma = 0, orthogonal = true); init)
     end
 
     @testset "Varimax" begin
@@ -138,11 +140,12 @@ end
         test_criterion_and_gradient(method, A)
 
         # Varimax is a special case of Oblimin
-        @test rotate(A, Varimax()) ≈ rotate(A, Oblimin(gamma = 1, orthogonal = true))
+        @test rotate(A, Varimax(); init) ≈
+              rotate(A, Oblimin(gamma = 1, orthogonal = true); init)
 
         # Varimax is a special case of Crawford-Ferguson
         p = size(A, 1)
-        @test rotate(A, Varimax()) ≈
-              rotate(A, CrawfordFerguson(kappa = 1 / p, orthogonal = true))
+        @test rotate(A, Varimax(); init) ≈
+              rotate(A, CrawfordFerguson(kappa = 1 / p, orthogonal = true); init)
     end
 end
