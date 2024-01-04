@@ -6,7 +6,7 @@ The family of Oblimin rotation methods.
 ## Keyword arguments
 - `gamma`: The shape parameter determining the rotation criterion (see Details).
 - `orthogonal`: If `orthogonal = true` an orthogonal rotation is performed, an oblique
-   rotation otherwise. (default: `false``)
+   rotation otherwise. (default: `false`)
 
 ## Details
 The Oblimin rotation family allow orthogonal as well as oblique rotation of the factor
