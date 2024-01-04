@@ -6,6 +6,8 @@ using LogExpFunctions
 using SimpleUnPack
 using Statistics
 
+import LinearAlgebra: rotate!
+
 export rotate, rotate!
 export criterion_and_gradient
 
