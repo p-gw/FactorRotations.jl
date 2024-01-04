@@ -1,3 +1,6 @@
+"""
+    Infomax
+"""
 struct Infomax{T} <: RotationMethod{T}
     function Infomax(; orthogonal = false)
         T = orthogonal ? Orthogonal : Oblique

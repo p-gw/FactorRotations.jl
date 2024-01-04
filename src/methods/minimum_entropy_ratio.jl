@@ -1,3 +1,6 @@
+"""
+    MinimumEntropyRatio
+"""
 struct MinimumEntropyRatio <: RotationMethod{Orthogonal} end
 
 function criterion_and_gradient(::MinimumEntropyRatio, Λ::AbstractMatrix{T}) where {T<:Real}

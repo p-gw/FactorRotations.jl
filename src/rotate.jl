@@ -1,6 +1,5 @@
 """
     rotate(Λ, method::RotationMethod; kwargs...)
-    rotate!(Λ, method::RotationMethod; kwargs...)
 
 Perform a rotation of the factor loading matrix `Λ`.
 
@@ -28,12 +27,12 @@ function rotate(Λ, method; kwargs...)
 end
 
 """
-    rotate(Λ, method::RotationMethod; kwargs...)
+    rotate!(Λ, method::RotationMethod; kwargs...)
 
 Perform a rotation of the factor loading matrix Λ and overwrite Λ with the rotated loading
 matrix.
 
-See also [`rotate`](@ref).
+For a list of available keyword arguments see [`rotate`](@ref).
 """
 function rotate!(Λ, method; kwargs...)
     Λ .= rotate(Λ, method; kwargs...)

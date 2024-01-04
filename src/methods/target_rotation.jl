@@ -1,3 +1,6 @@
+"""
+    TargetRotation
+"""
 struct TargetRotation{T,V<:AbstractMatrix} <: RotationMethod{T}
     H::V
     W::BitMatrix
