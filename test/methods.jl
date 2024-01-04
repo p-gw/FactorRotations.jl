@@ -130,8 +130,26 @@ end
         test_criterion_and_gradient(method, A)
 
         # Quartimax is a special case of Oblimin
-        @test rotate(A, Quartimax(); init) ≈
-              rotate(A, Oblimin(gamma = 0, orthogonal = true); init)
+        Ar = rotate(A, Quartimax(); init)
+        @test Ar ≈ rotate(A, Oblimin(gamma = 0, orthogonal = true); init)
+
+        # test that rotation result is identical published results by
+        # Bernaards & Jennrich (2005) within the reported accuracy of 7 digits
+        Ar = rotate(A, Quartimax(); init, atol = 1e-5)
+        Ar = round.(Ar, digits = 7)
+
+        pub = [
+            0.8987554 0.1948197
+            0.9339440 0.1297446
+            0.9021319 0.1038604
+            0.8765090 0.1712805
+            0.3155758 0.8764747
+            0.2511265 0.7734879
+            0.1980102 0.7146775
+            0.3078601 0.6593331
+        ]
+
+        @test Ar ≈ pub
     end
 
     @testset "Varimax" begin
