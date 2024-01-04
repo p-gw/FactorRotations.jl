@@ -15,7 +15,7 @@ Quartimax()
 ```
 
 ### Testing equivalence of Quartimax and Oblimin
-```jldoctest
+```jldoctest; filter = r"(\\d*)\\.(\\d{4})\\d+" => s"\\1.\\2"
 $(DEFINITION_L)
 julia> L_quartimax = rotate(L, Quartimax());
 ┌ Info: Rotation algorithm converged after 13 iterations.

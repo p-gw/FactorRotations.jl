@@ -10,7 +10,6 @@ DocMeta.setdocmeta!(
 
 makedocs(;
     checkdocs = :exported,
-    doctestfilters = [r"(\d*)\.(\d{4})\d+"],
     modules = [FactorRotations],
     authors = "Philipp Gewessler",
     repo = "https://github.com/p-gw/FactorRotations.jl/blob/{commit}{path}#{line}",
