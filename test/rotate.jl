@@ -9,5 +9,4 @@
     B = copy(A)
     rotate!(B, Quartimax())
     @test B == rotate(A, Quartimax())
-
 end

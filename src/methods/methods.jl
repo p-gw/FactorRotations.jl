@@ -1,3 +1,16 @@
+const DEFINITION_L = """
+julia> L = [
+           0.830 -0.396
+           0.818 -0.469
+           0.777 -0.470
+           0.798 -0.401
+           0.786  0.500
+           0.672  0.458
+           0.594  0.444
+           0.647  0.333
+       ];
+"""
+
 """
     RotationMethod{T<:RotationType}
 
@@ -18,7 +31,36 @@ element.
 """
 function criterion_and_gradient end
 
+"""
+    isorthogonal(::RotationMethod)
+
+Checks if the supplied rotation method is orthogonal.
+
+## Examples
+```jldoctest
+julia> isorthogonal(Varimax())
+true
+
+julia> isorthogonal(Oblimax(orthogonal = false))
+false
+```
+"""
 isorthogonal(method::RotationMethod) = method isa RotationMethod{Orthogonal}
+
+"""
+    isoblique(::RotationMethod)
+
+Checks if the supplied rotation method is oblique.
+
+## Examples
+```jldoctest
+julia> isoblique(Varimax())
+false
+
+julia> isoblique(Oblimax(orthogonal = false))
+true
+```
+"""
 isoblique(method::RotationMethod) = method isa RotationMethod{Oblique}
 
 include("biquartimax.jl")

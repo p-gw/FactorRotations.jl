@@ -1,5 +1,7 @@
 """
-minetropy
+    MinimumEntropy()
+
+The Minimum Entropy rotation method.
 """
 struct MinimumEntropy <: RotationMethod{Orthogonal} end
 

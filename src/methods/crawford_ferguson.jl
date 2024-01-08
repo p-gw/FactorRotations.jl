@@ -4,19 +4,29 @@
 The family of Crawford-Ferguson rotation methods.
 
 ## Keyword arguments
-- `kappa`: T
+- `kappa`: The parameter determining the rotation criterion (see Details).
+- `orthogonal`: orthogonal: If orthogonal = true an orthogonal rotation is performed, an
+                oblique rotation otherwise. (default: `false`)
 
 ## Details
 The Crawford-Ferguson family allows both orthogonal and oblique rotation of the
 `p`-by`k`-factor loading matrix. If orthogonal rotation is performed, Crawford-Ferguson is
 equivalent to Oblimin rotation given the following values for `kappa`:
 
-- `kappa = 0`: Quartimax
-- `kappa = 1/p`: Varimax
-- `kappa = k/2p`: Equamax
-- `kappa = (k - 1)/(p + k - 2)`: Parsimax
-- `kappa = 1`: Factor parsimony
+- `kappa = 0` → [`Quartimax`](@ref)
+- `kappa = 1/p` → [`Varimax`](@ref)
+- `kappa = k/2p` → Equamax
+- `kappa = (k - 1)/(p + k - 2)` → Parsimax
+- `kappa = 1` → Factor parsimony
 
+## Examples
+```jldoctest
+julia> CrawfordFerguson(kappa = 0, orthogonal = true)
+CrawfordFerguson{Orthogonal, Int64}(0)
+
+julia> CrawfordFerguson(kappa = 1/2, orthogonal = false)
+CrawfordFerguson{Oblique, Float64}(0.5)
+```
 """
 struct CrawfordFerguson{T,V} <: RotationMethod{T}
     κ::V
