@@ -1,7 +1,7 @@
 """
     rotate(Λ, method::RotationMethod; kwargs...)
 
-Perform a rotation of the factor loading matrix `Λ`.
+Perform a rotation of the factor loading matrix `Λ` using a rotation `method`.
 
 ## Keyword arguments
 - `atol`: Sets the absolute tolerance for convergence of the algorithm (default: 1e-6).
@@ -13,6 +13,25 @@ Perform a rotation of the factor loading matrix `Λ`.
 - `init`: A k-by-k matrix of starting values for the algorithm.
           If `init = nothing` (the default), the identity matrix will be used as starting
           values.
+
+## Examples
+```jldoctest; filter = r"(\\d*)\\.(\\d{4})\\d+" => s"\\1.\\2"
+$(DEFINITION_L)
+julia> rotate(L, Varimax())
+┌ Info: Rotation algorithm converged after 9 iterations.
+│       algorithm: Varimax
+└       criterion: -0.4515671564134383
+8×2 Matrix{Float64}:
+ 0.886061  0.246196
+ 0.924934  0.183253
+ 0.894664  0.155581
+ 0.865205  0.221416
+ 0.264636  0.893176
+ 0.206218  0.786653
+ 0.156572  0.724884
+ 0.269424  0.67595
+
+```
 """
 function rotate(Λ, method; kwargs...)
     rotation = _rotate(Λ, method; kwargs...)
@@ -29,10 +48,29 @@ end
 """
     rotate!(Λ, method::RotationMethod; kwargs...)
 
-Perform a rotation of the factor loading matrix Λ and overwrite Λ with the rotated loading
-matrix.
+Perform a rotation of the factor loading matrix `Λ` and overwrite `Λ` with the rotated
+loading matrix.
 
 For a list of available keyword arguments see [`rotate`](@ref).
+
+## Examples
+```jldoctest; filter = r"(\\d*)\\.(\\d{4})\\d+" => s"\\1.\\2"
+$(DEFINITION_L)
+julia> rotate!(L, Quartimax())
+┌ Info: Rotation algorithm converged after 13 iterations.
+│       algorithm: Quartimax
+└       criterion: -1.0227347961934472
+8×2 Matrix{Float64}:
+ 0.898755  0.194823
+ 0.933943  0.129748
+ 0.902132  0.103864
+ 0.876508  0.171284
+ 0.315572  0.876476
+ 0.251124  0.773489
+ 0.198008  0.714678
+ 0.307858  0.659334
+
+```
 """
 function rotate!(Λ, method; kwargs...)
     Λ .= rotate(Λ, method; kwargs...)

@@ -31,7 +31,36 @@ element.
 """
 function criterion_and_gradient end
 
+"""
+    isorthogonal(::RotationMethod)
+
+Checks if the supplied rotation method is orthogonal.
+
+## Examples
+```jldoctest
+julia> isorthogonal(Varimax())
+true
+
+julia> isorthogonal(Oblimax(orthogonal = false))
+false
+```
+"""
 isorthogonal(method::RotationMethod) = method isa RotationMethod{Orthogonal}
+
+"""
+    isoblique(::RotationMethod)
+
+Checks if the supplied rotation method is oblique.
+
+## Examples
+```jldoctest
+julia> isoblique(Varimax())
+false
+
+julia> isoblique(Oblimax(orthogonal = false))
+true
+```
+"""
 isoblique(method::RotationMethod) = method isa RotationMethod{Oblique}
 
 include("biquartimax.jl")

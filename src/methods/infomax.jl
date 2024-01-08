@@ -1,5 +1,11 @@
 """
-    Infomax
+    Infomax(; orthogonal = false)
+
+The Infomax rotation method.
+
+## Keyword arguments
+- `orthogonal`: If `orthogonal = true` an orthogonal rotation is performed, an oblique
+   rotation otherwise. (default: `false`)
 """
 struct Infomax{T} <: RotationMethod{T}
     function Infomax(; orthogonal = false)
@@ -7,7 +13,6 @@ struct Infomax{T} <: RotationMethod{T}
         return new{T}()
     end
 end
-
 
 function criterion_and_gradient(::Infomax, Λ::AbstractMatrix{T}) where {T<:Real}
     p, k = size(Λ)

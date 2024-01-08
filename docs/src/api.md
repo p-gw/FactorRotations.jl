@@ -13,9 +13,9 @@ Infomax
 MinimumEntropy
 MinimumEntropyRatio
 Oblimax
-TargetRotation
 Oblimin
 Quartimax
+TargetRotation
 Varimax
 ```
 
@@ -24,6 +24,8 @@ Varimax
 ```@docs
 rotate
 rotate!
+isorthogonal
+isoblique
 ```
 
 ## Internals

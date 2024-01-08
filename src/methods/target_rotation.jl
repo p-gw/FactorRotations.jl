@@ -54,6 +54,7 @@ julia> rotate(L, TargetRotation(target, orthogonal = true))
  0.168434  0.795599
  0.121793  0.731532
  0.236852  0.68804
+```
 """
 struct TargetRotation{T,V<:AbstractMatrix} <: RotationMethod{T}
     H::V
@@ -61,7 +62,7 @@ struct TargetRotation{T,V<:AbstractMatrix} <: RotationMethod{T}
     function TargetRotation(target; orthogonal = false)
         T = orthogonal ? Orthogonal : Oblique
 
-        # construct weight matrix assuming 'missing' and/or 'nothing' are unspecified
+        # construct weight matrix assuming 'missing' are unspecified values
         W = @. !ismissing(target)
         H = coalesce.(target, 0)
 
