@@ -101,15 +101,23 @@ A struct that holds the state of the rotation algorithm.
 - `iterations`: A vector of [`IterationState`](@ref) that holds iteration states of the
                 optimization.
 """
-mutable struct RotationState{T<:AbstractMatrix}
+mutable struct RotationState{RT<:RotationType,T<:AbstractMatrix}
     init::T
     A::T
     T::T
+    Ti::Union{Nothing,T}
     L::T
     iterations::Vector{IterationState}
 end
 
-RotationState(init, A) = RotationState(init, A, init, A * init, IterationState[])
+function RotationState(T::Type{Orthogonal}, init, A)
+    return RotationState{T,typeof(A)}(init, A, init, nothing, A * init, IterationState[])
+end
+
+function RotationState(T::Type{Oblique}, init, A)
+    Ti = inv(init)
+    return RotationState{T,typeof(A)}(init, A, init, Ti, A * Ti', IterationState[])
+end
 
 """
     _rotate(A::AbstractMatrix, method::RotationMethod{Orthogonal}; kwargs...)
@@ -119,26 +127,25 @@ orthogonal factor rotation.
 """
 function _rotate(
     A::AbstractMatrix{TV},
-    method::RotationMethod{Orthogonal};
+    method::RotationMethod{RT};
     atol = 1e-6,
     alpha = 1,
     maxiter1 = 1000,
     maxiter2 = 10,
     init::Union{Nothing,AbstractMatrix} = nothing,
-) where {TV<:Real}
-    state = initialize(init, A)
+) where {RT,TV<:Real}
+    state = initialize(RT, init, A)
     Q, ∇Q = criterion_and_gradient(method, state.L)
 
-    # setup intermediate values to avoid unnecessary allocations
+    # prallocate variables to avoid unnecessary allocations
     ft = Q
-    G = A' * ∇Q
+    G = gradient_f(state, ∇Q)
     Tt = similar(state.T)
     Gp = similar(state.T)
-
     s = zero(eltype(G))
 
-    for i in 1:maxiter1
-        project!(Gp, state.T, G)
+    for _ in 1:maxiter1
+        project_G!(state, Gp, G)
         s = norm(Gp)
 
         isconverged(s, atol) && break
@@ -147,14 +154,15 @@ function _rotate(
 
         for _ in 1:maxiter2
             X = state.T - alpha * Gp
-            @unpack U, Vt = svd(X)
-            Tt = U * Vt
-            mul!(state.L, A, Tt)
+            Tt = project_X(state, X)
+            update_state!(state, Tt)
+
             Q, ∇Q = criterion_and_gradient(method, state.L)
+
             if (Q < ft - 0.5 * s^2 * alpha)
                 state.T = Tt
                 ft = Q
-                mul!(G, A', ∇Q)
+                G = gradient_f(state, ∇Q)
                 break
             else
                 alpha /= 2
@@ -176,7 +184,7 @@ end
 Initialize a [`RotationState`](@ref) with initial values `init` and original loading matrix
 `A`. If `init = nothing`, the identity matrix will be used as initial values.
 """
-function initialize(init, A::AbstractMatrix{TV}) where {TV}
+function initialize(::Type{RT}, init, A::AbstractMatrix{TV}) where {RT<:RotationType,TV}
     p, k = size(A)
 
     if isnothing(init)
@@ -189,19 +197,67 @@ function initialize(init, A::AbstractMatrix{TV}) where {TV}
         throw(ArgumentError("matrix of starting values must be of size ($k, $k)"))
     end
 
-    return RotationState(T, A)
+    return RotationState(RT, T, A)
+end
+
+function gradient_f(state::RotationState{Orthogonal}, ∇Q)
+    @unpack A = state
+    G = A' * ∇Q
+    return G
+end
+
+function gradient_f(state::RotationState{Oblique}, ∇Q)
+    @unpack L, Ti = state
+    G = -(L' * ∇Q * Ti)'
+    return G
 end
 
 """
     project!(Gp, T, G)
 
-Compute the projection `Gp` of `G` for orthogonal matrices.
+Compute the projection `Gp` of `G` and store the results in `Gp`.
 """
-function project!(Gp, T, G)
+function project_G!(state::RotationState{Orthogonal}, Gp, G)
+    @unpack T = state
     M = T' * G
     S = (M + M') ./ 2
     Gp .= G - T * S
     return Gp
+end
+
+function project_G!(state::RotationState{Oblique}, Gp, G)
+    @unpack T = state
+    TG = T .* G
+    Gp .= G - T * diagm(vec(sum(TG, dims = 1)))
+    return Gp
+end
+
+"""
+compute the projection `Tt` of `X`.
+"""
+function project_X(state::RotationState{Orthogonal}, X)
+    @unpack U, Vt = svd(X)
+    Tt = U * Vt
+    return Tt
+end
+
+function project_X(state::RotationState{Oblique}, X)
+    Xsq = X .^ 2
+    v = 1 ./ sqrt.(sum(Xsq, dims = 1))
+    Tt = X * diagm(vec(v))
+    return Tt
+end
+
+"""
+update the rotation state given a new projection `Tt`.
+"""
+function update_state!(state::RotationState{Orthogonal}, Tt)
+    return mul!(state.L, state.A, Tt)
+end
+
+function update_state!(state::RotationState{Oblique}, Tt)
+    state.Ti = inv(Tt)
+    return mul!(state.L, state.A, state.Ti')
 end
 
 """
