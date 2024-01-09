@@ -137,7 +137,7 @@ function _rotate(
     state = initialize(RT, init, A)
     Q, ∇Q = criterion_and_gradient(method, state.L)
 
-    # prallocate variables to avoid unnecessary allocations
+    # preallocate variables to avoid unnecessary allocations
     ft = Q
     G = gradient_f(state, ∇Q)
     Tt = similar(state.T)
