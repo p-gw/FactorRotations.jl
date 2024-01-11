@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Rotate an existing loading matrix · FactorRotations.jl</title><meta name="title" content="Rotate an existing loading matrix · FactorRotations.jl"/><meta property="og:title" content="Rotate an existing loading matrix · FactorRotations.jl"/><meta property="twitter:title" content="Rotate an existing loading matrix · FactorRotations.jl"/><meta name="description" content="Documentation for FactorRotations.jl."/><meta property="og:description" content="Documentation for FactorRotations.jl."/><meta property="twitter:description" content="Documentation for FactorRotations.jl."/><meta property="og:url" content="https://p-gw.github.io/FactorRotations.jl/guides/basic_usage/"/><meta property="twitter:url" content="https://p-gw.github.io/FactorRotations.jl/guides/basic_usage/"/><link rel="canonical" href="https://p-gw.github.io/FactorRotations.jl/guides/basic_usage/"/><script data-outdated-warner src="../../assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.050/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="../.."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../../assets/documenter.js"></script><script src="../../search_index.js"></script><script src="../../siteinfo.js"></script><script src="../../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../../assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit"><a href="../../">FactorRotations.jl</a></span></div><button class="docs-search-query input is-rounded is-small is-clickable my-2 mx-auto py-1 px-2" id="documenter-search-query">Search docs (Ctrl + /)</button><ul class="docs-menu"><li><a class="tocitem" href="../../">Home</a></li><li><span class="tocitem">Guides</span><ul><li class="is-active"><a class="tocitem" href>Rotate an existing loading matrix</a><ul class="internal"><li><a class="tocitem" href="#In-place-rotation"><span>In-place rotation</span></a></li></ul></li></ul></li><li><a class="tocitem" href="../../rotation_methods/">Rotation Methods</a></li><li><a class="tocitem" href="../../api/">API</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><a class="docs-sidebar-button docs-navbar-link fa-solid fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">Guides</a></li><li class="is-active"><a href>Rotate an existing loading matrix</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Rotate an existing loading matrix</a></li></ul></nav><div class="docs-right"><a class="docs-navbar-link" href="https://github.com/p-gw/FactorRotations.jl/blob/main/docs/src/guides/basic_usage.md#" title="Edit source on GitHub"><span class="docs-icon fa-solid"></span></a><a class="docs-settings-button docs-navbar-link fa-solid fa-gear" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-article-toggle-button fa-solid fa-chevron-up" id="documenter-article-toggle-button" href="javascript:;" title="Collapse all docstrings"></a></div></header><article class="content" id="documenter-page"><h1 id="Rotate-an-existing-loading-matrix"><a class="docs-heading-anchor" href="#Rotate-an-existing-loading-matrix">Rotate an existing loading matrix</a><a id="Rotate-an-existing-loading-matrix-1"></a><a class="docs-heading-anchor-permalink" href="#Rotate-an-existing-loading-matrix" title="Permalink"></a></h1><p>This guide considers the basic use case of FactorRotations.jl: Given an existing factor loading matrix <code>L</code>, calculate the rotation of the loading matrix according to some rotation criterion. In this example we will first consider the simple case of orthogonal <em>Varimax</em> rotation. At a later stage we will see how to easily switch the factor rotation criterion to arrive at a different rotation.</p><p>First, we assume a factor loading matrix <code>L</code>.  In this example we will use the loading matrix given by Bernaard &amp; Jennrich (2005),</p><pre><code class="language-julia-repl hljs">julia&gt; using FactorRotations
+
+julia&gt; L = [
+           0.830 -0.396
+           0.818 -0.469
+           0.777 -0.470
+           0.798 -0.401
+           0.786  0.500
+           0.672  0.458
+           0.594  0.444
+           0.647  0.333
+       ]
+8×2 Matrix{Float64}:
+ 0.83   -0.396
+ 0.818  -0.469
+ 0.777  -0.47
+ 0.798  -0.401
+ 0.786   0.5
+ 0.672   0.458
+ 0.594   0.444
+ 0.647   0.333</code></pre><p>Rotating the loading matrix consists of a single call to <a href="../../api/#FactorRotations.rotate"><code>rotate</code></a>. This function takes the unrotated loading matrix as the first argument, and an instance of a factor rotation method as a second argument.</p><p>For clarity we first set up our <a href="../../api/#FactorRotations.Varimax"><code>Varimax</code></a> rotation method,</p><pre><code class="language-julia-repl hljs">julia&gt; criterion = Varimax()
+Varimax()</code></pre><p>Finally we perform the rotation using <a href="../../api/#FactorRotations.rotate"><code>rotate</code></a>,</p><pre><code class="language-julia-repl hljs">julia&gt; L_rotated = rotate(L, criterion)
+┌ Info: Rotation algorithm converged after 9 iterations.
+│       algorithm: Varimax
+└       criterion: -0.4515671564134383
+8×2 Matrix{Float64}:
+ 0.886061  0.246196
+ 0.924934  0.183253
+ 0.894664  0.155581
+ 0.865205  0.221416
+ 0.264636  0.893176
+ 0.206218  0.786653
+ 0.156572  0.724884
+ 0.269424  0.67595</code></pre><p>Different rotation can be achieved by simply changing <code>criterion</code> or passing it directly to <a href="../../api/#FactorRotations.rotate"><code>rotate</code></a>.</p><pre><code class="language-julia-repl hljs">julia&gt; L_rotated = rotate(L, MinimumEntropy())
+┌ Info: Rotation algorithm converged after 9 iterations.
+│       algorithm: MinimumEntropy
+└       criterion: 1.4822946782415076
+8×2 Matrix{Float64}:
+ 0.90711   0.151221
+ 0.939117  0.084524
+ 0.906093  0.0602051
+ 0.883753  0.128783
+ 0.357504  0.860225
+ 0.28816   0.760468
+ 0.232268  0.704289
+ 0.339319  0.643709 </code></pre><h2 id="In-place-rotation"><a class="docs-heading-anchor" href="#In-place-rotation">In-place rotation</a><a id="In-place-rotation-1"></a><a class="docs-heading-anchor-permalink" href="#In-place-rotation" title="Permalink"></a></h2><p>In some cases it can be useful to modify <code>L</code> directly.  For this use case the package provides an in-place rotation, <a href="../../api/#LinearAlgebra.rotate!"><code>rotate!</code></a> with the same function signature as before.</p><pre><code class="language-julia-repl hljs">julia&gt; rotate!(L, MinimumEntropy())
+┌ Info: Rotation algorithm converged after 9 iterations.
+│       algorithm: MinimumEntropy
+└       criterion: 1.4822946782415076
+8×2 Matrix{Float64}:
+ 0.90711   0.151221
+ 0.939117  0.084524
+ 0.906093  0.0602051
+ 0.883753  0.128783
+ 0.357504  0.860225
+ 0.28816   0.760468
+ 0.232268  0.704289
+ 0.339319  0.643709 
+
+julia&gt; L == L_rotated
+true</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../../">« Home</a><a class="docs-footer-nextpage" href="../../rotation_methods/">Rotation Methods »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="auto">Automatic (OS)</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.2.1 on <span class="colophon-date" title="Thursday 11 January 2024 15:42">Thursday 11 January 2024</span>. Using Julia version 1.10.0.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
