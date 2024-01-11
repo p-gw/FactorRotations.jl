@@ -10,19 +10,22 @@ using Statistics
 import LinearAlgebra: rotate!
 
 export rotate, rotate!
-export criterion_and_gradient
+export criterion, criterion_and_gradient
 
+export RotationMethod
 export Orthogonal, Oblique
 export isorthogonal, isoblique
 
 export Biquartimax
 export CrawfordFerguson
+export Cubimax
 export Infomax
 export MinimumEntropy
 export MinimumEntropyRatio
 export Oblimax
 export Oblimin
 export Quartimax
+export Simplimax
 export TargetRotation
 export Varimax
 

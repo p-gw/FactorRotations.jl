@@ -16,7 +16,11 @@ julia> L = [
 
 An abstract type representing a factor rotation method.
 
-Each implementation of M <: RotationMethod must implement [`criterion_and_gradient`](@ref).
+Each implementation of `M <: RotationMethod` must implement at least one of the following methods:
+- [`criterion`](@ref)
+- [`criterion_and_gradient`](@ref)
+
+If [`criterion`](@ref) is implemented, gradients are calculated by automatic differentiation.
 """
 abstract type RotationMethod{T<:RotationType} end
 
@@ -84,4 +88,5 @@ include("oblimax.jl")
 include("target_rotation.jl")
 include("oblimin.jl")
 include("quartimax.jl")
+include("simplimax.jl")
 include("varimax.jl")

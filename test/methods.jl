@@ -58,6 +58,12 @@ end
         test_criterion_and_gradient(method, A)
     end
 
+    @testset "Cubimax" begin
+        method = Cubimax()
+        @test isorthogonal(method)
+        test_criterion_and_gradient(method, A)
+    end
+
     @testset "Infomax" begin
         # orthogonal case
         method = Infomax(orthogonal = true)
@@ -162,6 +168,15 @@ end
         ]
 
         @test Ar ≈ pub
+    end
+
+    @testset "Simplimax" begin
+        @test_throws ArgumentError Simplimax(m = 0)
+        @test_throws ArgumentError Simplimax(m = -10)
+
+        method = Simplimax(m = 8)
+        @test isoblique(method)
+        test_criterion_and_gradient(method, A)
     end
 
     @testset "Varimax" begin
