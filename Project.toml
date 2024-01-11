@@ -12,6 +12,7 @@ SimpleUnPack = "ce78b400-467f-4804-87d8-8f486da07d0a"
 Statistics = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
 
 [compat]
+Enzyme = "0.11"
 FillArrays = "1"
 LogExpFunctions = "0.3"
 SimpleUnPack = "1"
