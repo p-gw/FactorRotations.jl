@@ -40,7 +40,7 @@ Varimax()
 
 Finally we perform the rotation using [`rotate`](@ref),
 
-```jldoctest basic_example
+```jldoctest basic_example; filter = r"(\\d*)\\.(\\d{4})\\d+" => s"\\1.\\2"
 julia> L_rotated = rotate(L, criterion)
 ┌ Info: Rotation algorithm converged after 9 iterations.
 │       algorithm: Varimax
