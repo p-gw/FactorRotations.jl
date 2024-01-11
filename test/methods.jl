@@ -8,6 +8,12 @@ function test_criterion_and_gradient(method, Λ)
 end
 
 @testset "factor rotation methods" begin
+    @testset "utility functions" begin
+        @test isorthogonal(Varimax()) != isoblique(Varimax())
+        @test isorthogonal(Oblimax(orthogonal = false)) !=
+              isoblique(Oblimax(orthogonal = false))
+    end
+
     @testset "Biquartimax" begin
         method = Biquartimax()
         @test isorthogonal(method)
@@ -86,6 +92,11 @@ end
         oblimax = rotate(A, method; init)
         quartimax = rotate(A, Quartimax(); init)
         @test isapprox(oblimax, quartimax, atol = 1e-6)
+
+        # oblique case
+        method = Oblimax(orthogonal = false)
+        @test isoblique(method)
+        test_criterion_and_gradient(method, A)
     end
 
     @testset "Oblimin" begin
@@ -97,6 +108,7 @@ end
         # oblique case
         method = Oblimin(gamma = 0.0, orthogonal = false)
         @test isoblique(method)
+        test_criterion_and_gradient(method, A)
     end
 
     @testset "TargetRotation" begin

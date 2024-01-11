@@ -1,5 +1,6 @@
 module FactorRotations
 
+using Enzyme
 using FillArrays
 using LinearAlgebra
 using LogExpFunctions

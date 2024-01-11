@@ -34,7 +34,7 @@ struct Oblimax{T} <: RotationMethod{T}
     end
 end
 
-function criterion_and_gradient(::Oblimax, Λ::AbstractMatrix{T}) where {T<:Real}
+function criterion_and_gradient(::Oblimax, Λ::AbstractMatrix)
     sqnorm_Λsq = norm(Λ .^ 2) .^ 2
     norm_Λ = norm(Λ)
 

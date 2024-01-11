@@ -185,7 +185,7 @@ Initialize a [`RotationState`](@ref) with initial values `init` and original loa
 `A`. If `init = nothing`, the identity matrix will be used as initial values.
 """
 function initialize(::Type{RT}, init, A::AbstractMatrix{TV}) where {RT<:RotationType,TV}
-    p, k = size(A)
+    _, k = size(A)
 
     if isnothing(init)
         T = Matrix{TV}(I, k, k)
