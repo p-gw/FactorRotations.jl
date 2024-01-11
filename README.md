@@ -12,7 +12,7 @@ in Bernaards & Jennrich (2005).
 To install FactorRotations.jl you can use the Julia package manager,
 
 ```julia
-] add https://github.com/p-gw/FactorRotations.jl.git
+] add FactorRotations
 ```
 
 ## Getting started

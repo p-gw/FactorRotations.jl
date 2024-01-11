@@ -16,6 +16,7 @@ A = [
 init = Matrix{Float64}(I, 2, 2)
 
 @testset "FactorRotations.jl" begin
+    include("normalize.jl")
     include("methods.jl")
     include("rotate.jl")
 end
