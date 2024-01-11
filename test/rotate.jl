@@ -49,6 +49,14 @@
         @test Gp != zeros(size(init))
     end
 
+    @testset "project_X" begin
+        state = FactorRotations.RotationState(Orthogonal, init, A)
+        @test FactorRotations.project_X(state, I(2)) == I(2)
+
+        state = FactorRotations.RotationState(Oblique, init, A)
+        @test FactorRotations.project_X(state, I(2)) == I(2)
+    end
+
     @testset "update_state!" begin
         Tt = [1 1; 1 0]
 
