@@ -12,6 +12,9 @@ import LinearAlgebra: rotate!
 export rotate, rotate!
 export criterion, criterion_and_gradient
 
+export kaiser_normalize, kaiser_denormalize
+export kaiser_normalize!, kaiser_denormalize!
+
 export RotationMethod
 export Orthogonal, Oblique
 export isorthogonal, isoblique
@@ -31,6 +34,7 @@ export TargetRotation
 export Varimax
 
 include("utils.jl")
+include("normalize.jl")
 include("rotation_types.jl")
 include("methods/methods.jl")
 include("rotate.jl")
