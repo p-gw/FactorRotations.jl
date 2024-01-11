@@ -19,6 +19,7 @@ export isorthogonal, isoblique
 export Biquartimax
 export CrawfordFerguson
 export Cubimax
+export Geomin
 export Infomax
 export MinimumEntropy
 export MinimumEntropyRatio

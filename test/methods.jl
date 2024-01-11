@@ -64,6 +64,14 @@ end
         test_criterion_and_gradient(method, A)
     end
 
+    @testset "Geomin" begin
+        @test_throws ArgumentError Geomin(epsilon = -1)
+
+        method = Geomin()
+        @test isoblique(method)
+        test_criterion_and_gradient(method, A)
+    end
+
     @testset "Infomax" begin
         # orthogonal case
         method = Infomax(orthogonal = true)

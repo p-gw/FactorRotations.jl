@@ -81,6 +81,7 @@ isoblique(method::RotationMethod) = method isa RotationMethod{Oblique}
 include("biquartimax.jl")
 include("crawford_ferguson.jl")
 include("cubimax.jl")
+include("geomin.jl")
 include("infomax.jl")
 include("minimum_entropy.jl")
 include("minimum_entropy_ratio.jl")
