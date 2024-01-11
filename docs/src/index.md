@@ -6,7 +6,7 @@
 [![Coverage](https://codecov.io/gh/p-gw/FactorRotations.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/p-gw/FactorRotations.jl)
 
 [FactorRotations.jl](https://github.com/p-gw/FactorRotations.jl) implements factor rotations by the gradient projections algorithms described
-by Bernaards & Jennrich (2005).
+in Bernaards & Jennrich (2005).
 
 ## Installation
 To install FactorRotations.jl you can use the Julia package manager,

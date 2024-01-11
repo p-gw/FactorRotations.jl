@@ -14,7 +14,7 @@ struct Infomax{T} <: RotationMethod{T}
     end
 end
 
-function criterion_and_gradient(::Infomax, Λ::AbstractMatrix{T}) where {T<:Real}
+function criterion_and_gradient(::Infomax, Λ::AbstractMatrix{T}) where {T}
     p, k = size(Λ)
     Λsq = Λ .^ 2
 

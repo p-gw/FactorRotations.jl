@@ -40,7 +40,7 @@ Varimax()
 
 Finally we perform the rotation using [`rotate`](@ref),
 
-```jldoctest basic_example
+```jldoctest basic_example; filter = r"([0-9]*)\.([0-9]{4})[0-9]+" => s"\1.\2"
 julia> L_rotated = rotate(L, criterion)
 ┌ Info: Rotation algorithm converged after 9 iterations.
 │       algorithm: Varimax
@@ -58,7 +58,7 @@ julia> L_rotated = rotate(L, criterion)
 
 Different rotation can be achieved by simply changing `criterion` or passing it directly to [`rotate`](@ref).
 
-```jldoctest basic_example
+```jldoctest basic_example; filter = r"([0-9]*)\.([0-9]{4})[0-9]+" => s"\1.\2"
 julia> L_rotated = rotate(L, MinimumEntropy())
 ┌ Info: Rotation algorithm converged after 9 iterations.
 │       algorithm: MinimumEntropy
@@ -78,7 +78,7 @@ julia> L_rotated = rotate(L, MinimumEntropy())
 In some cases it can be useful to modify `L` directly. 
 For this use case the package provides an in-place rotation, [`rotate!`](@ref) with the same function signature as before.
 
-```jldoctest basic_example
+```jldoctest basic_example; filter = r"([0-9]*)\.([0-9]{4})[0-9]+" => s"\1.\2"
 julia> rotate!(L, MinimumEntropy())
 ┌ Info: Rotation algorithm converged after 9 iterations.
 │       algorithm: MinimumEntropy
@@ -96,5 +96,3 @@ julia> rotate!(L, MinimumEntropy())
 julia> L == L_rotated
 true
 ```
-
-

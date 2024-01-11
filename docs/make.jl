@@ -22,7 +22,10 @@ makedocs(;
     ),
     pages = [
         "Home" => "index.md",
-        "Guides" => ["Rotate an existing loading matrix" => "guides/basic_usage.md"],
+        "Guides" => [
+            "Rotate an existing loading matrix" => "guides/basic_usage.md",
+            "Implementing rotation methods" => "guides/implementing_rotation_methods.md",
+        ],
         "Rotation Methods" => "rotation_methods.md",
         "API" => "api.md",
     ],

@@ -34,8 +34,10 @@ true
 """
 struct Quartimax <: RotationMethod{Orthogonal} end
 
-function criterion_and_gradient(::Quartimax, Λ::AbstractMatrix{<:Real})
-    Q = -1 / 4 * sum(x -> x^4, Λ)
+criterion(method::Quartimax, Λ::AbstractMatrix{<:Real}) = -sum(x -> x^4, Λ) / 4
+
+function criterion_and_gradient(method::Quartimax, Λ::AbstractMatrix)
+    Q = criterion(method, Λ)
     ∇Q = @. -Λ^3
     return Q, ∇Q
 end

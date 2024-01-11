@@ -6,3 +6,5 @@ function zerodiag!(x)
 end
 
 mxlogx(x) = -xlogx(x)
+
+nthsmallest(m::AbstractMatrix, n) = sort(vec(m))[n]
