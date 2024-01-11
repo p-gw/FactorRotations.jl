@@ -55,7 +55,7 @@ julia> criterion_and_gradient(MyQuartimax(), ones(10, 2))
 (-20.0, [-4.0 -4.0; -4.0 -4.0; … ; -4.0 -4.0; -4.0 -4.0])
 ```
 
-```jldoctest implementing_rotation_methods; filter = r"(\\d*)\\.(\\d{4})\\d+" => s"\\1.\\2"
+```jldoctest implementing_rotation_methods; filter = r"([0-9]*)\.([0-9]{4})[0-9]+" => s"\1.\2"
 julia> L = [
            0.830 -0.396
            0.818 -0.469
@@ -84,7 +84,7 @@ julia> L_rotated = rotate(L, MyQuartimax())
 
 Checking against the [`Quartimax`](@ref) implementation shows that the results are approximately equal.
 
-```jldoctest implementing_rotation_methods; filter = r"(\\d*)\\.(\\d{4})\\d+" => s"\\1.\\2"
+```jldoctest implementing_rotation_methods; filter = r"([0-9]*)\.([0-9]{4})[0-9]+" => s"\1.\2"
 julia> L_reference = rotate(L, Quartimax())
 ┌ Info: Rotation algorithm converged after 13 iterations.
 │       algorithm: Quartimax
@@ -131,7 +131,7 @@ julia> criterion_and_gradient(MyQuartimax(), ones(10, 2))
 
 Again, this method can be simply used with [`rotate`](@ref), now using the custom [`criterion_and_gradient`](@ref).
 
-```jldoctest implementing_rotation_methods; filter = r"(\\d*)\\.(\\d{4})\\d+" => s"\\1.\\2"
+```jldoctest implementing_rotation_methods; filter = r"([0-9]*)\.([0-9]{4})[0-9]+" => s"\1.\2"
 julia> L_rotated = rotate(L, MyQuartimax())
 ┌ Info: Rotation algorithm converged after 12 iterations.
 │       algorithm: MyQuartimax
