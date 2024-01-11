@@ -31,5 +31,9 @@ isoblique
 ## Internals
 
 ```@docs
+RotationMethod
+Orthogonal
+Oblique
+criterion
 criterion_and_gradient
 ```
