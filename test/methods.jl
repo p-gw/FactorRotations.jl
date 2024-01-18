@@ -24,6 +24,46 @@ end
               rotate(A, Oblimin(gamma = 0.5, orthogonal = true); init)
     end
 
+    @testset "ComponentLoss" begin
+        # orthogonal case
+        method = ComponentLoss(abs2, orthogonal = true)
+        @test isorthogonal(method)
+        test_criterion_and_gradient(method, A)
+
+        method = KatzRohlf(0.3)
+        @test isorthogonal(method)
+        @test_throws ArgumentError KatzRohlf(-1.0)
+        @test_throws ArgumentError KatzRohlf(0)
+        test_criterion_and_gradient(method, A)
+
+        method = LinearRightConstant(0.3)
+        @test isorthogonal(method)
+        @test_throws ArgumentError LinearRightConstant(-1.0)
+        @test_throws ArgumentError LinearRightConstant(0)
+        test_criterion_and_gradient(method, A)
+
+        # component loss identical to quartimax
+        componentloss = rotate(A, ComponentLoss(x -> x^4, orthogonal = true))
+        quartimax = rotate(A, Quartimax())
+        @test isapprox(componentloss, quartimax, atol = 1e-5)
+
+        # oblique case
+        method = ComponentLoss(abs2, orthogonal = false)
+        @test isoblique(method)
+        test_criterion_and_gradient(method, A)
+
+        method = Concave(1)
+        @test isoblique(method)
+        test_criterion_and_gradient(method, A)
+        @test_throws ArgumentError Concave(0)
+        @test_throws ArgumentError Concave(-2)
+
+        method = Absolmin(0)
+        @test isoblique(method)
+        test_criterion_and_gradient(method, A)
+        @test_throws ArgumentError Absolmin(-1.0)
+    end
+
     @testset "CrawfordFerguson" begin
         @test_throws ArgumentError CrawfordFerguson(kappa = 2.0)
         @test_throws ArgumentError CrawfordFerguson(kappa = -0.2)

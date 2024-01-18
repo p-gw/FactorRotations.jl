@@ -79,6 +79,7 @@ true
 isoblique(method::RotationMethod) = method isa RotationMethod{Oblique}
 
 include("biquartimax.jl")
+include("component_loss.jl")
 include("crawford_ferguson.jl")
 include("cubimax.jl")
 include("geomin.jl")

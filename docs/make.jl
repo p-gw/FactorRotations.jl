@@ -1,5 +1,9 @@
 using FactorRotations
 using Documenter
+using DocumenterCitations
+
+bibliography =
+    CitationBibliography(joinpath(@__DIR__, "src", "references.bib"), style = :authoryear)
 
 DocMeta.setdocmeta!(
     FactorRotations,
@@ -29,6 +33,7 @@ makedocs(;
         "Rotation Methods" => "rotation_methods.md",
         "API" => "api.md",
     ],
+    plugins = [bibliography],
 )
 
 deploydocs(; repo = "github.com/p-gw/FactorRotations.jl", devbranch = "main")
