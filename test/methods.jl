@@ -165,6 +165,18 @@ end
         test_criterion_and_gradient(method, A)
     end
 
+    @testset "PatternSimplicity" begin
+        # orthogonal case
+        method = PatternSimplicity(orthogonal = true)
+        @test isorthogonal(method)
+        test_criterion_and_gradient(method, A)
+
+        # oblique case
+        method = PatternSimplicity(orthogonal = false)
+        @test isoblique(method)
+        test_criterion_and_gradient(method, A)
+    end
+
     @testset "TargetRotation" begin
         @test_throws ArgumentError criterion_and_gradient(TargetRotation([0 1; 1 0]), A)
 

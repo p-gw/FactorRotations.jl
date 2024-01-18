@@ -17,6 +17,7 @@ A generic implementation of the component loss factor rotation method.
 
 ## Keyword arguments
 - `orthogonal`: If `orthogonal = true` an orthogonal rotation is performed, an oblique
+   rotation otherwise. (default: `false`)
 
 ## Details
 The component loss factor rotation applies a loss function to each element of the factor

@@ -19,6 +19,7 @@ MinimumEntropy
 MinimumEntropyRatio
 Oblimax
 Oblimin
+PatternSimplicity
 Quartimax
 TargetRotation
 Varimax
