@@ -24,6 +24,7 @@ export ComponentLoss, KatzRohlf, LinearRightConstant, Concave, Absolmin
 export CrawfordFerguson
 export Cubimax
 export Geomin
+export PatternSimplicity
 export Infomax
 export MinimumEntropy
 export MinimumEntropyRatio

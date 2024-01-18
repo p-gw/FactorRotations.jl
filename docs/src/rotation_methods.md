@@ -9,6 +9,8 @@ criterium                     | reference              | note
 [`Biquartimax`](@ref)         |                        | equivalent to `Oblimin(gamma = 0.5, orthogonal = true)`
 [`CrawfordFerguson`](@ref)    | [crawford1970](@citet) |
 [`Infomax`](@ref)             | [browne2001](@citet)   | based on the unpublished manuscript McKeon (1968)
+[`KatzRohlf`](@ref)           |                        |
+[`LinearRightConstant`](@ref) | [jennrich2004](@citet) |
 [`MinimumEntropyRatio`](@ref) | [mccammon1966](@citet) |
 [`MinimumEntropy`](@ref)      | [jennrich2004](@citet) |
 [`Oblimax`](@ref)             |                        |
@@ -16,16 +18,15 @@ criterium                     | reference              | note
 [`Quartimax`](@ref)           | [neuhaus1954](@citet)  | equivalent to `Oblimin(gamma = 0, orthogonal = true)`
 [`TargetRotation`](@ref)      |                        |
 [`Varimax`](@ref)             | [kaiser1958](@citet)   | equivalent to `Oblimin(gamma = 1, orthogonal = true)`
-[`KatzRohlf`](@ref)           |                        |
-[`LinearRightConstant`](@ref) | [jennrich2004](@citet) |
 
 ## Oblique rotation criteria
 
-criterium               | reference                            | note
------------------------ | ------------------------------------ | ---------------------------
-[`Absolmin`](@ref)      | [jennrich2006](@citet)               |
-[`ComponentLoss`](@ref) | [jennrich2004, jennrich2006](@citet) | both orthogonal and oblique
-[`Concave`](@ref)       | [jennrich2006](@citet)               |
+criterium                   | reference                            | note
+--------------------------- | ------------------------------------ | ---------------------------
+[`Absolmin`](@ref)          | [jennrich2006](@citet)               |
+[`ComponentLoss`](@ref)     | [jennrich2004, jennrich2006](@citet) | both orthogonal and oblique
+[`Concave`](@ref)           | [jennrich2006](@citet)               |
+[`PatternSimplicity`](@ref) | [bentler1977](@citet)                | both orthogonal and oblique
 
 ## References
 
