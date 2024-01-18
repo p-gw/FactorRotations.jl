@@ -173,7 +173,7 @@ function _rotate(
         push!(state.iterations, iteration_state)
     end
 
-    isconverged(s, atol) || error("not converged")
+    isconverged(s, atol) || error("Algorithm did not converge after $(maxiter1) iterations")
 
     return state
 end
