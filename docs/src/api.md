@@ -7,9 +7,14 @@ CurrentModule = FactorRotations
 ## Rotation criteria
 
 ```@docs
+Absolmin
 Biquartimax
+ComponentLoss
+Concave
 CrawfordFerguson
 Infomax
+KatzRohlf
+LinearRightConstant
 MinimumEntropy
 MinimumEntropyRatio
 Oblimax
