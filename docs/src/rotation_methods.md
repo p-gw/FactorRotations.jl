@@ -16,6 +16,9 @@ criterium                     | reference              | note
 [`Oblimax`](@ref)             |                        |
 [`Oblimin`](@ref)             |                        | equivalent to `Oblimin` for orthogonal rotation
 [`Quartimax`](@ref)           | [neuhaus1954](@citet)  | equivalent to `Oblimin(gamma = 0, orthogonal = true)`
+[`TandemCriteria`](@ref)      | [comrey1967](@citet)   |
+[`TandemCriterionII`](@ref)   | [comrey1967](@citet)   |
+[`TandemCriterionI`](@ref)    | [comrey1967](@citet)   |
 [`TargetRotation`](@ref)      |                        |
 [`Varimax`](@ref)             | [kaiser1958](@citet)   | equivalent to `Oblimin(gamma = 1, orthogonal = true)`
 

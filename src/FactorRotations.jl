@@ -32,6 +32,7 @@ export Oblimax
 export Oblimin
 export Quartimax
 export Simplimax
+export TandemCriterionI, TandemCriterionII, TandemCriteria
 export TargetRotation
 export Varimax
 
