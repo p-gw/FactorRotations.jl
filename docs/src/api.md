@@ -21,6 +21,9 @@ Oblimax
 Oblimin
 PatternSimplicity
 Quartimax
+TandemCriteria
+TandemCriterionI
+TandemCriterionII
 TargetRotation
 Varimax
 ```

@@ -177,6 +177,24 @@ end
         test_criterion_and_gradient(method, A)
     end
 
+    @testset "TandemCriteria" begin
+        method = TandemCriterionI()
+        @test isorthogonal(method)
+        test_criterion_and_gradient(method, A)
+
+        method = TandemCriterionII()
+        @test isorthogonal(method)
+        test_criterion_and_gradient(method, A)
+
+        @test_throws ArgumentError TandemCriteria(keep = 0)
+        @test_throws ArgumentError TandemCriteria(keep = -1)
+        @test_throws ArgumentError TandemCriteria(keep = 1)
+
+        method = TandemCriteria(keep = 2)
+        @test isorthogonal(method)
+        @test size(rotate(A, method)) == (8, 2)
+    end
+
     @testset "TargetRotation" begin
         @test_throws ArgumentError criterion_and_gradient(TargetRotation([0 1; 1 0]), A)
 

@@ -45,6 +45,13 @@ function rotate(Λ, method; kwargs...)
     return rotation.L
 end
 
+function rotate(Λ, method::TandemCriteria; kwargs...)
+    rotation_1 = rotate(Λ, TandemCriterionI(); kwargs...)
+    reduced_loading_matrix = rotation_1[:, 1:method.keep]
+    rotation_2 = rotate(reduced_loading_matrix, TandemCriterionII(); kwargs...)
+    return rotation_2
+end
+
 """
     rotate!(Λ, method::RotationMethod; kwargs...)
 
