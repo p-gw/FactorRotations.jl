@@ -69,4 +69,25 @@
         @test oblique_state.Ti == inv(Tt)
         @test oblique_state.L == A * inv(Tt)'
     end
+
+    @testset "MultivariateStatsExt" begin
+        using MultivariateStats
+
+        X = rand(3, 100)
+        methods = [FactorAnalysis, PCA, PPCA]
+
+        for method in methods
+            model = fit(FactorAnalysis, X)
+            raw_loadings = loadings(model)
+            rotated_loadings = rotate(raw_loadings, Varimax())
+
+            @test size(raw_loadings) == (3, 2)
+            @test size(rotate(model, Varimax())) == (3, 2)
+            @test rotated_loadings == rotate(model, Varimax())
+            @test loadings(model) == raw_loadings
+
+            @test rotate(raw_loadings, Varimax()) == rotate!(model, Varimax())
+            @test loadings(model) == rotated_loadings
+        end
+    end
 end
