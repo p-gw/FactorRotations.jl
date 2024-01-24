@@ -2,6 +2,8 @@
 Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
 DocumenterCitations = "daee34ce-89f3-4625-b898-19384cb65244"
 FactorRotations = "be5e9834-f3d9-4b7e-b5ea-d062861d4ac2"
+MultivariateStats = "6f286f6a-111f-5878-ab1e-185364afe411"
 
 [compat]
 Documenter = "1"
+MultivariateStats = "0.10"
