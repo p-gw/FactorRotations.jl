@@ -223,7 +223,8 @@ end
 
         method = TandemCriteria(keep = 2)
         @test isorthogonal(method)
-        @test size(rotate(A, method)) == (8, 2)
+        rot = rotate(A, method)
+        @test size(loadings(rot)) == (8, 2)
     end
 
     @testset "TargetRotation" begin
