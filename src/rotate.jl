@@ -1,4 +1,45 @@
 """
+    FactorRotation{T <: Real}
+
+A type holding results of a factor rotation.
+
+## Fields
+- `L`: The rotated factor loading matrix
+- `T`: The factor rotation matrix
+- `phi`: The factor correlation matrix
+"""
+struct FactorRotation{T}
+    L::Matrix{T}
+    T::Matrix{T}
+    phi::Matrix{T}
+end
+
+function FactorRotation(L, T)
+    return FactorRotation(L, T, T' * T)
+end
+
+"""
+    loadings(r::FactorRotation)
+
+Return the rotated factor loading matrix from `r`.
+"""
+loadings(r::FactorRotation) = r.L
+
+"""
+    rotation(r::FactorRotation)
+
+Return the factor rotation matrix from `r`.
+"""
+rotation(r::FactorRotation) = r.T
+
+"""
+    factor_correlation(r::FactorRotation)
+
+Return the factor correlation matrix from `r`.
+"""
+factor_correlation(r::FactorRotation) = r.phi
+
+"""
     rotate(Λ, method::RotationMethod; kwargs...)
 
 Perform a rotation of the factor loading matrix `Λ` using a rotation `method`.
@@ -42,7 +83,7 @@ function rotate(Λ, method; kwargs...)
           criterion: $(last(rotation.iterations).Q)
     """
 
-    return rotation.L
+    return FactorRotation(rotation.L, rotation.T)
 end
 
 function rotate(Λ, method::TandemCriteria; kwargs...)
@@ -80,7 +121,8 @@ julia> rotate!(L, Quartimax())
 ```
 """
 function rotate!(Λ, method; kwargs...)
-    Λ .= rotate(Λ, method; kwargs...)
+    rot = rotate(Λ, method; kwargs...)
+    Λ .= loadings(rot)
     return Λ
 end
 

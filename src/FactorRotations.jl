@@ -9,6 +9,7 @@ using Statistics
 
 import LinearAlgebra: rotate!
 
+export FactorRotation, loadings, rotation, factor_correlation
 export rotate, rotate!
 export criterion, criterion_and_gradient
 

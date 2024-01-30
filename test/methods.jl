@@ -7,6 +7,29 @@ function test_criterion_and_gradient(method, Λ)
     return nothing
 end
 
+function test_rotate(method, Λ; init)
+    rot = rotate(Λ, method; init)
+    p, k = size(Λ)
+
+    @test size(loadings(rot)) == (p, k)
+    @test size(rotation(rot)) == (k, k)
+    @test size(factor_correlation(rot)) == (k, k)
+    @test loadings(rot) * rotation(rot)' ≈ Λ
+
+    if isorthogonal(method)
+        @test factor_correlation(rot) ≈ I
+    end
+end
+
+function test_equivalence(Λ, m1::RotationMethod, m2::RotationMethod; kwargs...)
+    r1 = rotate(Λ, m1; kwargs...)
+    r2 = rotate(Λ, m2; kwargs...)
+
+    @test isapprox(loadings(r1), loadings(r2), atol = 1e-5)
+    @test isapprox(rotation(r1), rotation(r2), atol = 1e-5)
+    @test isapprox(factor_correlation(r1), factor_correlation(r2), atol = 1e-5)
+end
+
 @testset "factor rotation methods" begin
     @testset "utility functions" begin
         @test isorthogonal(Varimax()) != isoblique(Varimax())
@@ -20,8 +43,7 @@ end
         test_criterion_and_gradient(method, A)
 
         # Biquartimax is a special case of Oblimin
-        @test rotate(A, Biquartimax(); init) ≈
-              rotate(A, Oblimin(gamma = 0.5, orthogonal = true); init)
+        test_equivalence(A, Biquartimax(), Oblimin(gamma = 0.5, orthogonal = true); init)
     end
 
     @testset "ComponentLoss" begin
@@ -43,9 +65,7 @@ end
         test_criterion_and_gradient(method, A)
 
         # component loss identical to quartimax
-        componentloss = rotate(A, ComponentLoss(x -> x^4, orthogonal = true))
-        quartimax = rotate(A, Quartimax())
-        @test isapprox(componentloss, quartimax, atol = 1e-5)
+        test_equivalence(A, ComponentLoss(x -> x^4, orthogonal = true), Quartimax(); init)
 
         # oblique case
         method = ComponentLoss(abs2, orthogonal = false)
@@ -76,17 +96,30 @@ end
         # for the orthogonal case, Crawford-Ferguson and Oblimin are equivalent
         p, k = size(A)
 
-        @test rotate(A, CrawfordFerguson(kappa = 0, orthogonal = true); init) ≈
-              rotate(A, Quartimax(); init)
-
-        @test rotate(A, CrawfordFerguson(kappa = 0, orthogonal = true); init) ≈
-              rotate(A, Oblimin(gamma = 0, orthogonal = true); init)
-
-        @test rotate(A, CrawfordFerguson(kappa = 1 / p, orthogonal = true); init) ≈
-              rotate(A, Varimax(); init)
-
-        @test rotate(A, CrawfordFerguson(kappa = 1 / p, orthogonal = true); init) ≈
-              rotate(A, Oblimin(gamma = 1, orthogonal = true); init)
+        test_equivalence(
+            A,
+            CrawfordFerguson(kappa = 0, orthogonal = true),
+            Quartimax();
+            init,
+        )
+        test_equivalence(
+            A,
+            CrawfordFerguson(kappa = 0, orthogonal = true),
+            Oblimin(gamma = 0, orthogonal = true);
+            init,
+        )
+        test_equivalence(
+            A,
+            CrawfordFerguson(kappa = 1 / p, orthogonal = true),
+            Varimax();
+            init,
+        )
+        test_equivalence(
+            A,
+            CrawfordFerguson(kappa = 1 / p, orthogonal = true),
+            Oblimin(gamma = 1, orthogonal = true);
+            init,
+        )
 
         # TODO: Equamax: kappa = k/2p
         # TODO: Parsimax: kappa = (k - 1)/(p + k - 2)
@@ -143,9 +176,7 @@ end
         test_criterion_and_gradient(method, A)
 
         # Oblimax is equivalent to Quartimax in the orthogonal case
-        oblimax = rotate(A, method; init)
-        quartimax = rotate(A, Quartimax(); init)
-        @test isapprox(oblimax, quartimax, atol = 1e-6)
+        test_equivalence(A, method, Quartimax(); init)
 
         # oblique case
         method = Oblimax(orthogonal = false)
@@ -226,13 +257,12 @@ end
         test_criterion_and_gradient(method, A)
 
         # Quartimax is a special case of Oblimin
-        Ar = rotate(A, Quartimax(); init)
-        @test Ar ≈ rotate(A, Oblimin(gamma = 0, orthogonal = true); init)
+        test_equivalence(A, Quartimax(), Oblimin(gamma = 0, orthogonal = true); init)
 
         # test that rotation result is identical published results by
         # Bernaards & Jennrich (2005) within the reported accuracy of 7 digits
         Ar = rotate(A, Quartimax(); init, atol = 1e-5)
-        Ar = round.(Ar, digits = 7)
+        Ar = round.(loadings(Ar), digits = 7)
 
         pub = [
             0.8987554 0.1948197
@@ -263,12 +293,15 @@ end
         test_criterion_and_gradient(method, A)
 
         # Varimax is a special case of Oblimin
-        @test rotate(A, Varimax(); init) ≈
-              rotate(A, Oblimin(gamma = 1, orthogonal = true); init)
+        test_equivalence(A, Varimax(), Oblimin(gamma = 1, orthogonal = true); init)
 
         # Varimax is a special case of Crawford-Ferguson
         p = size(A, 1)
-        @test rotate(A, Varimax(); init) ≈
-              rotate(A, CrawfordFerguson(kappa = 1 / p, orthogonal = true); init)
+        test_equivalence(
+            A,
+            Varimax(),
+            CrawfordFerguson(kappa = 1 / p, orthogonal = true);
+            init,
+        )
     end
 end
