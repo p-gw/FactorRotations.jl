@@ -14,14 +14,8 @@ The Oblimax rotation method is equivalent to [`Quartimax`](@ref) for orthogonal 
 ```jldoctest; filter = r"(\\d*)\\.(\\d{4})\\d+" => s"\\1.\\2"
 $(DEFINITION_L)
 julia> L_oblimax = rotate(L, Oblimax(orthogonal = true));
-┌ Info: Rotation algorithm converged after 15 iterations.
-│       algorithm: Oblimax{Orthogonal}
-└       criterion: 2.1632611287219916
 
 julia> L_quartimax = rotate(L, Quartimax());
-┌ Info: Rotation algorithm converged after 13 iterations.
-│       algorithm: Quartimax
-└       criterion: -1.0227347961934472
 
 julia> isapprox(L_oblimax, L_quartimax, atol = 1e-6)
 true

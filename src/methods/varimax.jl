@@ -18,14 +18,8 @@ Varimax()
 ```jldoctest; filter = r"(\\d*)\\.(\\d{4})\\d+" => s"\\1.\\2"
 $(DEFINITION_L)
 julia> L_varimax = rotate(L, Varimax());
-┌ Info: Rotation algorithm converged after 9 iterations.
-│       algorithm: Varimax
-└       criterion: -0.4515671564134383
 
 julia> L_oblimin = rotate(L, Oblimin(gamma = 1, orthogonal = true));
-┌ Info: Rotation algorithm converged after 9 iterations.
-│       algorithm: Oblimin{Orthogonal, Int64}
-└       criterion: -0.4149267008747196
 
 julia> L_varimax ≈ L_oblimin
 true
