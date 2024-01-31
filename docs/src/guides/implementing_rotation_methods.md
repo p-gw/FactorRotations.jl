@@ -68,9 +68,7 @@ julia> L = [
        ];
 
 julia> L_rotated = rotate(L, MyQuartimax()) 
-┌ Info: Rotation algorithm converged after 16 iterations.
-│       algorithm: MyQuartimax
-└       criterion: -4.090939184775285
+FactorRotation{Float64} with loading matrix:
 8×2 Matrix{Float64}:
  0.898755  0.194824
  0.933943  0.129749
@@ -86,9 +84,7 @@ Checking against the [`Quartimax`](@ref) implementation shows that the results a
 
 ```jldoctest implementing_rotation_methods; filter = r"([0-9]*)\.([0-9]{4})[0-9]+" => s"\1.\2"
 julia> L_reference = rotate(L, Quartimax())
-┌ Info: Rotation algorithm converged after 13 iterations.
-│       algorithm: Quartimax
-└       criterion: -1.0227347961934468
+FactorRotation{Float64} with loading matrix:
 8×2 Matrix{Float64}:
  0.898755  0.194823
  0.933943  0.129748
@@ -101,7 +97,7 @@ julia> L_reference = rotate(L, Quartimax())
 ```
 
 ```jldoctest implementing_rotation_methods
-julia> isapprox(L_rotated, L_reference, atol = 1e-5)
+julia> isapprox(loadings(L_rotated), loadings(L_reference), atol = 1e-5)
 true
 ```
 
@@ -133,9 +129,7 @@ Again, this method can be simply used with [`rotate`](@ref), now using the custo
 
 ```jldoctest implementing_rotation_methods; filter = r"([0-9]*)\.([0-9]{4})[0-9]+" => s"\1.\2"
 julia> L_rotated = rotate(L, MyQuartimax())
-┌ Info: Rotation algorithm converged after 12 iterations.
-│       algorithm: MyQuartimax
-└       criterion: -4.090939184774669
+FactorRotation{Float64} with loading matrix:
 8×2 Matrix{Float64}:
  0.898755  0.194824
  0.933943  0.129749
@@ -146,6 +140,6 @@ julia> L_rotated = rotate(L, MyQuartimax())
  0.198007  0.714678
  0.307857  0.659335
 
-julia> isapprox(L_rotated, L_reference, atol = 1e-5)
+julia> isapprox(loadings(L_rotated), loadings(L_reference), atol = 1e-5)
 true
 ```

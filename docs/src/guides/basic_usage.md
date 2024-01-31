@@ -42,9 +42,7 @@ Finally we perform the rotation using [`rotate`](@ref),
 
 ```jldoctest basic_example; filter = r"([0-9]*)\.([0-9]{4})[0-9]+" => s"\1.\2"
 julia> L_rotated = rotate(L, criterion)
-┌ Info: Rotation algorithm converged after 9 iterations.
-│       algorithm: Varimax
-└       criterion: -0.4515671564134383
+FactorRotation{Float64} with loading matrix:
 8×2 Matrix{Float64}:
  0.886061  0.246196
  0.924934  0.183253
@@ -60,9 +58,7 @@ Different rotation can be achieved by simply changing `criterion` or passing it 
 
 ```jldoctest basic_example; filter = r"([0-9]*)\.([0-9]{4})[0-9]+" => s"\1.\2"
 julia> L_rotated = rotate(L, MinimumEntropy())
-┌ Info: Rotation algorithm converged after 9 iterations.
-│       algorithm: MinimumEntropy
-└       criterion: 1.4822946782415076
+FactorRotation{Float64} with loading matrix:
 8×2 Matrix{Float64}:
  0.90711   0.151221
  0.939117  0.084524
@@ -74,15 +70,12 @@ julia> L_rotated = rotate(L, MinimumEntropy())
  0.339319  0.643709 
 ```
 
-## In-place rotation
-In some cases it can be useful to modify `L` directly. 
-For this use case the package provides an in-place rotation, [`rotate!`](@ref) with the same function signature as before.
+The resulting [`FactorRotation`](@ref) object contains the rotated loading matrix, the rotation
+matrix, and the factor correlation matrix. To access the fields you can use [`loadings`](@ref),
+[`rotation`](@ref), and [`factor_correlation`](@ref) respectively.
 
 ```jldoctest basic_example; filter = r"([0-9]*)\.([0-9]{4})[0-9]+" => s"\1.\2"
-julia> rotate!(L, MinimumEntropy())
-┌ Info: Rotation algorithm converged after 9 iterations.
-│       algorithm: MinimumEntropy
-└       criterion: 1.4822946782415076
+julia> loadings(L_rotated)
 8×2 Matrix{Float64}:
  0.90711   0.151221
  0.939117  0.084524
@@ -93,6 +86,37 @@ julia> rotate!(L, MinimumEntropy())
  0.232268  0.704289
  0.339319  0.643709 
 
-julia> L == L_rotated
+julia> rotation(L_rotated)
+2×2 Matrix{Float64}:
+  0.819445  0.573158
+ -0.573158  0.819445
+
+julia> factor_correlation(L_rotated)
+2×2 Matrix{Float64}:
+  1.0          -1.66533e-16
+ -1.66533e-16   1.0
+
+```
+
+## In-place rotation
+In some cases it can be useful to modify `L` directly. 
+For this use case the package provides an in-place rotation, [`rotate!`](@ref) with the same function signature as before.
+
+!!! warning
+    Contrary to [`rotate`](@ref), the in-place [`rotate!`](@ref) returns the loading matrix instead of a [`FactorRotation`](@ref) object.
+
+```jldoctest basic_example; filter = r"([0-9]*)\.([0-9]{4})[0-9]+" => s"\1.\2"
+julia> rotate!(L, MinimumEntropy())
+8×2 Matrix{Float64}:
+ 0.90711   0.151221
+ 0.939117  0.084524
+ 0.906093  0.0602051
+ 0.883753  0.128783
+ 0.357504  0.860225
+ 0.28816   0.760468
+ 0.232268  0.704289
+ 0.339319  0.643709 
+
+julia> L == loadings(L_rotated)
 true
 ```

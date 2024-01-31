@@ -35,11 +35,15 @@ rotate
 rotate!
 isorthogonal
 isoblique
+loadings
+rotation
+factor_correlation
 ```
 
 ## Internals
 
 ```@docs
+FactorRotation
 RotationMethod
 Orthogonal
 Oblique

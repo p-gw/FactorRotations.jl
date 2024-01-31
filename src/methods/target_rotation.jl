@@ -22,9 +22,7 @@ $(DEFINITION_L)
 julia> target = [1 0; 1 0; 1 0; 1 0; 0 1; 0 1; 0 1; 0 1];
 
 julia> rotate(L, TargetRotation(target, orthogonal = true))
-┌ Info: Rotation algorithm converged after 9 iterations.
-│       algorithm: TargetRotation{Orthogonal, Matrix{Int64}}
-└       criterion: 0.3306828147982428
+FactorRotation{Float64} with loading matrix:
 8×2 Matrix{Float64}:
  0.882633  0.258215
  0.922358  0.195806
@@ -42,9 +40,7 @@ $(DEFINITION_L)
 julia> target = [1 0; missing missing; 1 0; 1 0; 0 1; 0 1; 0 1; 0 1];
 
 julia> rotate(L, TargetRotation(target, orthogonal = true))
-┌ Info: Rotation algorithm converged after 13 iterations.
-│       algorithm: TargetRotation{Orthogonal, Matrix{Union{Missing, Int64}}}
-└       criterion: 0.30515405794256284
+FactorRotation{Float64} with loading matrix:
 8×2 Matrix{Float64}:
  0.873299  0.288209
  0.915133  0.227193
