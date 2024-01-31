@@ -20,7 +20,7 @@ end
 
 function Base.show(io::IO, r::FactorRotation)
     println(io, "$(typeof(r)) with loading matrix:")
-    display(r.L)
+    show(io, "text/plain", r.L)
     return nothing
 end
 
