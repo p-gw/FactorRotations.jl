@@ -34,9 +34,7 @@ $(DEFINITION_L)
 julia> quartimax_loss = ComponentLoss(x -> x^4, orthogonal = true);
 
 julia> L_component_loss = rotate(L, quartimax_loss)
-┌ Info: Rotation algorithm converged after 16 iterations.
-│       algorithm: ComponentLoss{Orthogonal, var"#40#41"}
-└       criterion: -4.090939184775285
+FactorRotation{Float64} with loading matrix:
 8×2 Matrix{Float64}:
  0.898755  0.194824
  0.933943  0.129749
@@ -48,9 +46,7 @@ julia> L_component_loss = rotate(L, quartimax_loss)
  0.307857  0.659334
 
 julia> L_quartimax = rotate(L, Quartimax())
-┌ Info: Rotation algorithm converged after 13 iterations.
-│       algorithm: Quartimax
-└       criterion: -1.0227347961934468
+FactorRotation{Float64} with loading matrix:
 8×2 Matrix{Float64}:
  0.898755  0.194823
  0.933943  0.129748
@@ -61,7 +57,7 @@ julia> L_quartimax = rotate(L, Quartimax())
  0.198008  0.714678
  0.307858  0.659334
 
-julia> isapprox(L_component_loss, L_quartimax, atol = 1e-5)
+julia> isapprox(loadings(L_component_loss), loadings(L_quartimax), atol = 1e-5)
 true
 ```
 """

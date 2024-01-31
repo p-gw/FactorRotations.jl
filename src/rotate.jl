@@ -1,4 +1,51 @@
 """
+    FactorRotation{T <: Real}
+
+A type holding results of a factor rotation.
+
+## Fields
+- `L`: The rotated factor loading matrix
+- `T`: The factor rotation matrix
+- `phi`: The factor correlation matrix
+"""
+struct FactorRotation{T}
+    L::Matrix{T}
+    T::Matrix{T}
+    phi::Matrix{T}
+end
+
+function FactorRotation(L, T)
+    return FactorRotation(L, T, T' * T)
+end
+
+function Base.show(io::IO, r::FactorRotation)
+    println(io, "$(typeof(r)) with loading matrix:")
+    show(io, "text/plain", r.L)
+    return nothing
+end
+
+"""
+    loadings(r::FactorRotation)
+
+Return the rotated factor loading matrix from `r`.
+"""
+loadings(r::FactorRotation) = r.L
+
+"""
+    rotation(r::FactorRotation)
+
+Return the factor rotation matrix from `r`.
+"""
+rotation(r::FactorRotation) = r.T
+
+"""
+    factor_correlation(r::FactorRotation)
+
+Return the factor correlation matrix from `r`.
+"""
+factor_correlation(r::FactorRotation) = r.phi
+
+"""
     rotate(Λ, method::RotationMethod; kwargs...)
 
 Perform a rotation of the factor loading matrix `Λ` using a rotation `method`.
@@ -13,14 +60,13 @@ Perform a rotation of the factor loading matrix `Λ` using a rotation `method`.
 - `init`: A k-by-k matrix of starting values for the algorithm.
           If `init = nothing` (the default), the identity matrix will be used as starting
           values.
+- `verbose`: Print logging statements (default: false)
 
 ## Examples
 ```jldoctest; filter = r"(\\d*)\\.(\\d{4})\\d+" => s"\\1.\\2"
 $(DEFINITION_L)
 julia> rotate(L, Varimax())
-┌ Info: Rotation algorithm converged after 9 iterations.
-│       algorithm: Varimax
-└       criterion: -0.4515671564134383
+FactorRotation{Float64} with loading matrix:
 8×2 Matrix{Float64}:
  0.886061  0.246196
  0.924934  0.183253
@@ -33,21 +79,20 @@ julia> rotate(L, Varimax())
 
 ```
 """
-function rotate(Λ, method; kwargs...)
-    rotation = _rotate(Λ, method; kwargs...)
+function rotate(Λ, method; verbose = false, kwargs...)
+    rotation = _rotate(Λ, method; verbose, kwargs...)
 
-    @info """
-    Rotation algorithm converged after $(length(rotation.iterations)) iterations.
-          algorithm: $(typeof(method))
-          criterion: $(last(rotation.iterations).Q)
-    """
+    if verbose
+        @info "Rotation algorithm converged after $(length(rotation.iterations)) iterations." algorithm =
+            typeof(method) criterion = last(rotation.iterations).Q
+    end
 
-    return rotation.L
+    return FactorRotation(rotation.L, rotation.T)
 end
 
 function rotate(Λ, method::TandemCriteria; kwargs...)
     rotation_1 = rotate(Λ, TandemCriterionI(); kwargs...)
-    reduced_loading_matrix = rotation_1[:, 1:method.keep]
+    reduced_loading_matrix = loadings(rotation_1)[:, 1:method.keep]
     rotation_2 = rotate(reduced_loading_matrix, TandemCriterionII(); kwargs...)
     return rotation_2
 end
@@ -64,9 +109,6 @@ For a list of available keyword arguments see [`rotate`](@ref).
 ```jldoctest; filter = r"(\\d*)\\.(\\d{4})\\d+" => s"\\1.\\2"
 $(DEFINITION_L)
 julia> rotate!(L, Quartimax())
-┌ Info: Rotation algorithm converged after 13 iterations.
-│       algorithm: Quartimax
-└       criterion: -1.0227347961934472
 8×2 Matrix{Float64}:
  0.898755  0.194823
  0.933943  0.129748
@@ -80,7 +122,8 @@ julia> rotate!(L, Quartimax())
 ```
 """
 function rotate!(Λ, method; kwargs...)
-    Λ .= rotate(Λ, method; kwargs...)
+    rot = rotate(Λ, method; kwargs...)
+    Λ .= loadings(rot)
     return Λ
 end
 
@@ -140,6 +183,7 @@ function _rotate(
     maxiter1 = 1000,
     maxiter2 = 10,
     init::Union{Nothing,AbstractMatrix} = nothing,
+    verbose = false,
 ) where {RT,TV<:Real}
     state = initialize(RT, init, A)
     Q, ∇Q = criterion_and_gradient(method, state.L)
@@ -151,7 +195,7 @@ function _rotate(
     Gp = similar(state.T)
     s = zero(eltype(G))
 
-    for _ in 1:maxiter1
+    for i in 1:maxiter1
         project_G!(state, Gp, G)
         s = norm(Gp)
 
@@ -167,6 +211,9 @@ function _rotate(
             Q, ∇Q = criterion_and_gradient(method, state.L)
 
             if (Q < ft - 0.5 * s^2 * alpha)
+                if verbose
+                    @info "State at iteration $(i):" criterion = Q alpha = alpha
+                end
                 state.T = Tt
                 ft = Q
                 G = gradient_f(state, ∇Q)
