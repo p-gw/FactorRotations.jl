@@ -12,7 +12,7 @@ fitted `MultivariateStats.FactorAnalysis`, `MultivariateStats.PCA`, or
 For a list of available keyword arguments see [`rotate`](@ref).
 """
 function FactorRotations.rotate(model::Union{PCA,PPCA,FactorAnalysis}, method; kwargs...)
-    L = loadings(model)
+    L = MultivariateStats.loadings(model)
     return rotate(L, method; kwargs...)
 end
 
@@ -26,7 +26,7 @@ fitted `MultivariateStats.FactorAnalysis`, `MultivariateStats.PCA`, or
 For a list of available keyword arguments see [`rotate`](@ref).
 """
 function FactorRotations.rotate!(model::Union{PCA,PPCA,FactorAnalysis}, method; kwargs...)
-    L = loadings(model)
+    L = MultivariateStats.loadings(model)
     return rotate!(L, method; kwargs...)
 end
 
