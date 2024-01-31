@@ -14,7 +14,7 @@ julia> L_biquartimax = rotate(L, Biquartimax());
 
 julia> L_oblimin = rotate(L, Oblimin(gamma = 0.5, orthogonal = true));
 
-julia> L_biquartimax ≈ L_oblimin
+julia> loadings(L_biquartimax) ≈ loadings(L_oblimin)
 true
 ```
 """

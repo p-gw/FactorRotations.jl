@@ -21,7 +21,7 @@ julia> L_varimax = rotate(L, Varimax());
 
 julia> L_oblimin = rotate(L, Oblimin(gamma = 1, orthogonal = true));
 
-julia> L_varimax ≈ L_oblimin
+julia> loadings(L_varimax) ≈ loadings(L_oblimin)
 true
 ```
 

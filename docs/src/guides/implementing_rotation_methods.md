@@ -97,7 +97,7 @@ FactorRotation{Float64} with loading matrix:
 ```
 
 ```jldoctest implementing_rotation_methods
-julia> isapprox(L_rotated, L_reference, atol = 1e-5)
+julia> isapprox(loadings(L_rotated), loadings(L_reference), atol = 1e-5)
 true
 ```
 
@@ -140,6 +140,6 @@ FactorRotation{Float64} with loading matrix:
  0.198007  0.714678
  0.307857  0.659335
 
-julia> isapprox(L_rotated, L_reference, atol = 1e-5)
+julia> isapprox(loadings(L_rotated), loadings(L_reference), atol = 1e-5)
 true
 ```

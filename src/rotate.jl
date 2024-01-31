@@ -109,7 +109,6 @@ For a list of available keyword arguments see [`rotate`](@ref).
 ```jldoctest; filter = r"(\\d*)\\.(\\d{4})\\d+" => s"\\1.\\2"
 $(DEFINITION_L)
 julia> rotate!(L, Quartimax())
-FactorRotation{Float64} with loading matrix:
 8×2 Matrix{Float64}:
  0.898755  0.194823
  0.933943  0.129748

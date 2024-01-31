@@ -17,7 +17,7 @@ julia> L_oblimax = rotate(L, Oblimax(orthogonal = true));
 
 julia> L_quartimax = rotate(L, Quartimax());
 
-julia> isapprox(L_oblimax, L_quartimax, atol = 1e-6)
+julia> isapprox(loadings(L_oblimax), loadings(L_quartimax), atol = 1e-6)
 true
 ```
 """

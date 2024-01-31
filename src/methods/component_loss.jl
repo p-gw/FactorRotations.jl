@@ -57,7 +57,7 @@ FactorRotation{Float64} with loading matrix:
  0.198008  0.714678
  0.307858  0.659334
 
-julia> isapprox(L_component_loss, L_quartimax, atol = 1e-5)
+julia> isapprox(loadings(L_component_loss), loadings(L_quartimax), atol = 1e-5)
 true
 ```
 """
