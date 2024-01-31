@@ -21,9 +21,7 @@ julia&gt; L = [
  0.594   0.444
  0.647   0.333</code></pre><p>Rotating the loading matrix consists of a single call to <a href="../../api/#FactorRotations.rotate"><code>rotate</code></a>. This function takes the unrotated loading matrix as the first argument, and an instance of a factor rotation method as a second argument.</p><p>For clarity we first set up our <a href="../../api/#FactorRotations.Varimax"><code>Varimax</code></a> rotation method,</p><pre><code class="language-julia-repl hljs">julia&gt; criterion = Varimax()
 Varimax()</code></pre><p>Finally we perform the rotation using <a href="../../api/#FactorRotations.rotate"><code>rotate</code></a>,</p><pre><code class="language-julia-repl hljs">julia&gt; L_rotated = rotate(L, criterion)
-┌ Info: Rotation algorithm converged after 9 iterations.
-│       algorithm: Varimax
-└       criterion: -0.4515671564134383
+FactorRotation{Float64} with loading matrix:
 8×2 Matrix{Float64}:
  0.886061  0.246196
  0.924934  0.183253
@@ -33,9 +31,7 @@ Varimax()</code></pre><p>Finally we perform the rotation using <a href="../../ap
  0.206218  0.786653
  0.156572  0.724884
  0.269424  0.67595</code></pre><p>Different rotation can be achieved by simply changing <code>criterion</code> or passing it directly to <a href="../../api/#FactorRotations.rotate"><code>rotate</code></a>.</p><pre><code class="language-julia-repl hljs">julia&gt; L_rotated = rotate(L, MinimumEntropy())
-┌ Info: Rotation algorithm converged after 9 iterations.
-│       algorithm: MinimumEntropy
-└       criterion: 1.4822946782415076
+FactorRotation{Float64} with loading matrix:
 8×2 Matrix{Float64}:
  0.90711   0.151221
  0.939117  0.084524
@@ -44,10 +40,7 @@ Varimax()</code></pre><p>Finally we perform the rotation using <a href="../../ap
  0.357504  0.860225
  0.28816   0.760468
  0.232268  0.704289
- 0.339319  0.643709 </code></pre><h2 id="In-place-rotation"><a class="docs-heading-anchor" href="#In-place-rotation">In-place rotation</a><a id="In-place-rotation-1"></a><a class="docs-heading-anchor-permalink" href="#In-place-rotation" title="Permalink"></a></h2><p>In some cases it can be useful to modify <code>L</code> directly.  For this use case the package provides an in-place rotation, <a href="../../api/#LinearAlgebra.rotate!"><code>rotate!</code></a> with the same function signature as before.</p><pre><code class="language-julia-repl hljs">julia&gt; rotate!(L, MinimumEntropy())
-┌ Info: Rotation algorithm converged after 9 iterations.
-│       algorithm: MinimumEntropy
-└       criterion: 1.4822946782415076
+ 0.339319  0.643709 </code></pre><p>The resulting <a href="../../api/#FactorRotations.FactorRotation"><code>FactorRotation</code></a> object contains the rotated loading matrix, the rotation matrix, and the factor correlation matrix. To access the fields you can use <a href="../../api/#FactorRotations.loadings"><code>loadings</code></a>, <a href="../../api/#FactorRotations.rotation"><code>rotation</code></a>, and <a href="../../api/#FactorRotations.factor_correlation"><code>factor_correlation</code></a> respectively.</p><pre><code class="language-julia-repl hljs">julia&gt; loadings(L_rotated)
 8×2 Matrix{Float64}:
  0.90711   0.151221
  0.939117  0.084524
@@ -58,5 +51,25 @@ Varimax()</code></pre><p>Finally we perform the rotation using <a href="../../ap
  0.232268  0.704289
  0.339319  0.643709 
 
-julia&gt; L == L_rotated
-true</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../../">« Home</a><a class="docs-footer-nextpage" href="../implementing_rotation_methods/">Implementing rotation methods »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="auto">Automatic (OS)</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.2.1 on <span class="colophon-date" title="Tuesday 30 January 2024 13:50">Tuesday 30 January 2024</span>. Using Julia version 1.10.0.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+julia&gt; rotation(L_rotated)
+2×2 Matrix{Float64}:
+  0.819445  0.573158
+ -0.573158  0.819445
+
+julia&gt; factor_correlation(L_rotated)
+2×2 Matrix{Float64}:
+  1.0          -1.66533e-16
+ -1.66533e-16   1.0
+</code></pre><h2 id="In-place-rotation"><a class="docs-heading-anchor" href="#In-place-rotation">In-place rotation</a><a id="In-place-rotation-1"></a><a class="docs-heading-anchor-permalink" href="#In-place-rotation" title="Permalink"></a></h2><p>In some cases it can be useful to modify <code>L</code> directly.  For this use case the package provides an in-place rotation, <a href="../../api/#LinearAlgebra.rotate!"><code>rotate!</code></a> with the same function signature as before.</p><div class="admonition is-warning"><header class="admonition-header">Warning</header><div class="admonition-body"><p>Contrary to <a href="../../api/#FactorRotations.rotate"><code>rotate</code></a>, the in-place <a href="../../api/#LinearAlgebra.rotate!"><code>rotate!</code></a> returns the loading matrix instead of a <a href="../../api/#FactorRotations.FactorRotation"><code>FactorRotation</code></a> object.</p></div></div><pre><code class="language-julia-repl hljs">julia&gt; rotate!(L, MinimumEntropy())
+8×2 Matrix{Float64}:
+ 0.90711   0.151221
+ 0.939117  0.084524
+ 0.906093  0.0602051
+ 0.883753  0.128783
+ 0.357504  0.860225
+ 0.28816   0.760468
+ 0.232268  0.704289
+ 0.339319  0.643709 
+
+julia&gt; L == loadings(L_rotated)
+true</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../../">« Home</a><a class="docs-footer-nextpage" href="../implementing_rotation_methods/">Implementing rotation methods »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="auto">Automatic (OS)</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.2.1 on <span class="colophon-date" title="Wednesday 31 January 2024 12:02">Wednesday 31 January 2024</span>. Using Julia version 1.10.0.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>

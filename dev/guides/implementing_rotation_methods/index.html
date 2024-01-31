@@ -22,9 +22,7 @@ julia&gt; criterion(MyQuartimax(), ones(10, 2))
        ];
 
 julia&gt; L_rotated = rotate(L, MyQuartimax()) 
-┌ Info: Rotation algorithm converged after 16 iterations.
-│       algorithm: MyQuartimax
-└       criterion: -4.090939184775285
+FactorRotation{Float64} with loading matrix:
 8×2 Matrix{Float64}:
  0.898755  0.194824
  0.933943  0.129749
@@ -34,9 +32,7 @@ julia&gt; L_rotated = rotate(L, MyQuartimax())
  0.251123  0.773489
  0.198007  0.714678
  0.307857  0.659334</code></pre><p>Checking against the <a href="../../api/#FactorRotations.Quartimax"><code>Quartimax</code></a> implementation shows that the results are approximately equal.</p><pre><code class="language-julia-repl hljs">julia&gt; L_reference = rotate(L, Quartimax())
-┌ Info: Rotation algorithm converged after 13 iterations.
-│       algorithm: Quartimax
-└       criterion: -1.0227347961934468
+FactorRotation{Float64} with loading matrix:
 8×2 Matrix{Float64}:
  0.898755  0.194823
  0.933943  0.129748
@@ -45,7 +41,7 @@ julia&gt; L_rotated = rotate(L, MyQuartimax())
  0.315572  0.876476
  0.251124  0.773489
  0.198008  0.714678
- 0.307858  0.659334</code></pre><pre><code class="language-julia-repl hljs">julia&gt; isapprox(L_rotated, L_reference, atol = 1e-5)
+ 0.307858  0.659334</code></pre><pre><code class="language-julia-repl hljs">julia&gt; isapprox(loadings(L_rotated), loadings(L_reference), atol = 1e-5)
 true</code></pre><h2 id="Methods-with-gradients"><a class="docs-heading-anchor" href="#Methods-with-gradients">Methods with gradients</a><a id="Methods-with-gradients-1"></a><a class="docs-heading-anchor-permalink" href="#Methods-with-gradients" title="Permalink"></a></h2><p>When gradients are available it can be helpful to implementing them directly. In this case <a href="../../api/#FactorRotations.criterion_and_gradient"><code>criterion_and_gradient</code></a> can be directly implemented. This can be beneficial for example if computation can be reused between the calculation of the criterion and its gradient.</p><p>Continuing the example of <code>MyQuartimax</code>:</p><pre><code class="language-julia-repl hljs">julia&gt; import FactorRotations: criterion_and_gradient
 
 julia&gt; function criterion_and_gradient(method::MyQuartimax, Λ::AbstractMatrix)
@@ -54,9 +50,7 @@ julia&gt; function criterion_and_gradient(method::MyQuartimax, Λ::AbstractMatri
            return Q, ∇Q
        end;</code></pre><p>Evaluating the function will now use the newly defined method, </p><pre><code class="language-julia-repl hljs">julia&gt; criterion_and_gradient(MyQuartimax(), ones(10, 2))
 (-20.0, [-1.0 -1.0; -1.0 -1.0; … ; -1.0 -1.0; -1.0 -1.0])</code></pre><p>Again, this method can be simply used with <a href="../../api/#FactorRotations.rotate"><code>rotate</code></a>, now using the custom <a href="../../api/#FactorRotations.criterion_and_gradient"><code>criterion_and_gradient</code></a>.</p><pre><code class="language-julia-repl hljs">julia&gt; L_rotated = rotate(L, MyQuartimax())
-┌ Info: Rotation algorithm converged after 12 iterations.
-│       algorithm: MyQuartimax
-└       criterion: -4.090939184774669
+FactorRotation{Float64} with loading matrix:
 8×2 Matrix{Float64}:
  0.898755  0.194824
  0.933943  0.129749
@@ -67,5 +61,5 @@ julia&gt; function criterion_and_gradient(method::MyQuartimax, Λ::AbstractMatri
  0.198007  0.714678
  0.307857  0.659335
 
-julia&gt; isapprox(L_rotated, L_reference, atol = 1e-5)
-true</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../basic_usage/">« Rotate an existing loading matrix</a><a class="docs-footer-nextpage" href="../../rotation_methods/">Rotation Methods »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="auto">Automatic (OS)</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.2.1 on <span class="colophon-date" title="Tuesday 30 January 2024 13:50">Tuesday 30 January 2024</span>. Using Julia version 1.10.0.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+julia&gt; isapprox(loadings(L_rotated), loadings(L_reference), atol = 1e-5)
+true</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../basic_usage/">« Rotate an existing loading matrix</a><a class="docs-footer-nextpage" href="../../rotation_methods/">Rotation Methods »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="auto">Automatic (OS)</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.2.1 on <span class="colophon-date" title="Wednesday 31 January 2024 12:02">Wednesday 31 January 2024</span>. Using Julia version 1.10.0.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
