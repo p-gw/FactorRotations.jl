@@ -82,16 +82,17 @@
 
         for method in methods
             model = fit(FactorAnalysis, X)
-            raw_loadings = loadings(model)
-            rotated_loadings = rotate(raw_loadings, Varimax())
+            raw_loadings = MultivariateStats.loadings(model)
+            rot = rotate(raw_loadings, Varimax())
+            rotated_loadings = FactorRotations.loadings(rot)
 
             @test size(raw_loadings) == (3, 2)
-            @test size(rotate(model, Varimax())) == (3, 2)
-            @test rotated_loadings == rotate(model, Varimax())
-            @test loadings(model) == raw_loadings
+            @test size(FactorRotations.loadings(rotate(model, Varimax()))) == (3, 2)
+            @test rotated_loadings == FactorRotations.loadings(rotate(model, Varimax()))
+            @test MultivariateStats.loadings(model) == raw_loadings
 
-            @test rotate(raw_loadings, Varimax()) == rotate!(model, Varimax())
-            @test loadings(model) == rotated_loadings
+            @test rotated_loadings == rotate!(model, Varimax())
+            @test MultivariateStats.loadings(model) == rotated_loadings
         end
     end
 end
