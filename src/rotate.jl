@@ -18,6 +18,12 @@ function FactorRotation(L, T)
     return FactorRotation(L, T, T' * T)
 end
 
+function Base.show(io::IO, r::FactorRotation)
+    println(io, "$(typeof(r)) with loading matrix:")
+    display(r.L)
+    return nothing
+end
+
 """
     loadings(r::FactorRotation)
 
@@ -54,14 +60,13 @@ Perform a rotation of the factor loading matrix `Λ` using a rotation `method`.
 - `init`: A k-by-k matrix of starting values for the algorithm.
           If `init = nothing` (the default), the identity matrix will be used as starting
           values.
+- `verbose`: Print logging statements (default: false)
 
 ## Examples
 ```jldoctest; filter = r"(\\d*)\\.(\\d{4})\\d+" => s"\\1.\\2"
 $(DEFINITION_L)
 julia> rotate(L, Varimax())
-┌ Info: Rotation algorithm converged after 9 iterations.
-│       algorithm: Varimax
-└       criterion: -0.4515671564134383
+FactorRotation{Float64} with loading matrix:
 8×2 Matrix{Float64}:
  0.886061  0.246196
  0.924934  0.183253
@@ -74,14 +79,13 @@ julia> rotate(L, Varimax())
 
 ```
 """
-function rotate(Λ, method; kwargs...)
-    rotation = _rotate(Λ, method; kwargs...)
+function rotate(Λ, method; verbose = false, kwargs...)
+    rotation = _rotate(Λ, method; verbose, kwargs...)
 
-    @info """
-    Rotation algorithm converged after $(length(rotation.iterations)) iterations.
-          algorithm: $(typeof(method))
-          criterion: $(last(rotation.iterations).Q)
-    """
+    if verbose
+        @info "Rotation algorithm converged after $(length(rotation.iterations)) iterations." algorithm =
+            typeof(method) criterion = last(rotation.iterations).Q
+    end
 
     return FactorRotation(rotation.L, rotation.T)
 end
@@ -105,9 +109,7 @@ For a list of available keyword arguments see [`rotate`](@ref).
 ```jldoctest; filter = r"(\\d*)\\.(\\d{4})\\d+" => s"\\1.\\2"
 $(DEFINITION_L)
 julia> rotate!(L, Quartimax())
-┌ Info: Rotation algorithm converged after 13 iterations.
-│       algorithm: Quartimax
-└       criterion: -1.0227347961934472
+FactorRotation{Float64} with loading matrix:
 8×2 Matrix{Float64}:
  0.898755  0.194823
  0.933943  0.129748
@@ -182,6 +184,7 @@ function _rotate(
     maxiter1 = 1000,
     maxiter2 = 10,
     init::Union{Nothing,AbstractMatrix} = nothing,
+    verbose = false,
 ) where {RT,TV<:Real}
     state = initialize(RT, init, A)
     Q, ∇Q = criterion_and_gradient(method, state.L)
@@ -193,7 +196,7 @@ function _rotate(
     Gp = similar(state.T)
     s = zero(eltype(G))
 
-    for _ in 1:maxiter1
+    for i in 1:maxiter1
         project_G!(state, Gp, G)
         s = norm(Gp)
 
@@ -209,6 +212,9 @@ function _rotate(
             Q, ∇Q = criterion_and_gradient(method, state.L)
 
             if (Q < ft - 0.5 * s^2 * alpha)
+                if verbose
+                    @info "State at iteration $(i):" criterion = Q alpha = alpha
+                end
                 state.T = Tt
                 ft = Q
                 G = gradient_f(state, ∇Q)
