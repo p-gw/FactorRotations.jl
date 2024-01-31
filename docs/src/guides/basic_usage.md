@@ -42,9 +42,7 @@ Finally we perform the rotation using [`rotate`](@ref),
 
 ```jldoctest basic_example; filter = r"([0-9]*)\.([0-9]{4})[0-9]+" => s"\1.\2"
 julia> L_rotated = rotate(L, criterion)
-┌ Info: Rotation algorithm converged after 9 iterations.
-│       algorithm: Varimax
-└       criterion: -0.4515671564134383
+FactorRotation{Float64} with loading matrix:
 8×2 Matrix{Float64}:
  0.886061  0.246196
  0.924934  0.183253
@@ -60,9 +58,7 @@ Different rotation can be achieved by simply changing `criterion` or passing it 
 
 ```jldoctest basic_example; filter = r"([0-9]*)\.([0-9]{4})[0-9]+" => s"\1.\2"
 julia> L_rotated = rotate(L, MinimumEntropy())
-┌ Info: Rotation algorithm converged after 9 iterations.
-│       algorithm: MinimumEntropy
-└       criterion: 1.4822946782415076
+FactorRotation{Float64} with loading matrix:
 8×2 Matrix{Float64}:
  0.90711   0.151221
  0.939117  0.084524
@@ -80,9 +76,7 @@ For this use case the package provides an in-place rotation, [`rotate!`](@ref) w
 
 ```jldoctest basic_example; filter = r"([0-9]*)\.([0-9]{4})[0-9]+" => s"\1.\2"
 julia> rotate!(L, MinimumEntropy())
-┌ Info: Rotation algorithm converged after 9 iterations.
-│       algorithm: MinimumEntropy
-└       criterion: 1.4822946782415076
+FactorRotation{Float64} with loading matrix:
 8×2 Matrix{Float64}:
  0.90711   0.151221
  0.939117  0.084524
