@@ -83,8 +83,8 @@ function rotate(Λ, method; verbose = false, kwargs...)
     rotation = _rotate(Λ, method; verbose, kwargs...)
 
     if verbose
-        @info "Rotation algorithm converged after $(length(rotation.iterations)) iterations." algorithm =
-            typeof(method) criterion = last(rotation.iterations).Q
+        @info "Rotation algorithm converged after $(length(rotation.iterations)) iterations."
+        @info "Final criterion value = $(last(rotation.iterations).Q)"
     end
 
     return FactorRotation(rotation.L, rotation.T)
@@ -185,8 +185,11 @@ function _rotate(
     init::Union{Nothing,AbstractMatrix} = nothing,
     verbose = false,
 ) where {RT,TV<:Real}
-    state = initialize(RT, init, A)
+    verbose && @info "Initializing rotation using algorithm $(typeof(method))."
+    state = initialize(RT, init, A; verbose)
     Q, ∇Q = criterion_and_gradient(method, state.L)
+
+    verbose && @info "Initial criterion value = $(Q)"
 
     # preallocate variables to avoid unnecessary allocations
     ft = Q
@@ -195,6 +198,7 @@ function _rotate(
     Gp = similar(state.T)
     s = zero(eltype(G))
 
+    verbose && @info "Starting optimization..."
     for i in 1:maxiter1
         project_G!(state, Gp, G)
         s = norm(Gp)
@@ -211,9 +215,6 @@ function _rotate(
             Q, ∇Q = criterion_and_gradient(method, state.L)
 
             if (Q < ft - 0.5 * s^2 * alpha)
-                if verbose
-                    @info "State at iteration $(i):" criterion = Q alpha = alpha
-                end
                 state.T = Tt
                 ft = Q
                 G = gradient_f(state, ∇Q)
@@ -221,6 +222,10 @@ function _rotate(
             else
                 alpha /= 2
             end
+        end
+
+        if verbose
+            @info "Current optimization state:" iteration = i criterion = Q alpha = alpha
         end
 
         iteration_state = IterationState(alpha, maxiter2, Q)
@@ -238,10 +243,17 @@ end
 Initialize a [`RotationState`](@ref) with initial values `init` and original loading matrix
 `A`. If `init = nothing`, the identity matrix will be used as initial values.
 """
-function initialize(::Type{RT}, init, A::AbstractMatrix{TV}) where {RT<:RotationType,TV}
+function initialize(
+    ::Type{RT},
+    init,
+    A::AbstractMatrix{TV};
+    verbose,
+) where {RT<:RotationType,TV}
     _, k = size(A)
 
     if isnothing(init)
+        verbose &&
+            @info "No initial values provided. Using identity matrix as starting value."
         T = Matrix{TV}(I, k, k)
     else
         T = init
