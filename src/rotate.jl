@@ -79,13 +79,12 @@ FactorRotation{Float64} with loading matrix:
 
 ```
 """
-function rotate(Λ, method; verbose = false, kwargs...)
-    rotation = _rotate(Λ, method; verbose, kwargs...)
+function rotate(Λ, method; verbose = VERBOSITY[], kwargs...)
+    loglevel = verbose ? Logging.Info : Logging.Debug
+    rotation = _rotate(Λ, method; loglevel, kwargs...)
 
-    if verbose
-        @info "Rotation algorithm converged after $(length(rotation.iterations)) iterations."
-        @info "Final criterion value = $(last(rotation.iterations).Q)"
-    end
+    @logmsg loglevel "Rotation algorithm converged after $(length(rotation.iterations)) iterations."
+    @logmsg loglevel "Final criterion value = $(last(rotation.iterations).Q)"
 
     return FactorRotation(rotation.L, rotation.T)
 end
@@ -183,13 +182,13 @@ function _rotate(
     maxiter1 = 1000,
     maxiter2 = 10,
     init::Union{Nothing,AbstractMatrix} = nothing,
-    verbose = false,
+    loglevel,
 ) where {RT,TV<:Real}
-    verbose && @info "Initializing rotation using algorithm $(typeof(method))."
-    state = initialize(RT, init, A; verbose)
+    @logmsg loglevel "Initializing rotation using algorithm $(typeof(method))."
+    state = initialize(RT, init, A; loglevel)
     Q, ∇Q = criterion_and_gradient(method, state.L)
 
-    verbose && @info "Initial criterion value = $(Q)"
+    @logmsg loglevel "Initial criterion value = $(Q)"
 
     # preallocate variables to avoid unnecessary allocations
     ft = Q
@@ -198,7 +197,7 @@ function _rotate(
     Gp = similar(state.T)
     s = zero(eltype(G))
 
-    verbose && @info "Starting optimization..."
+    @logmsg loglevel "Starting optimization..."
     for i in 1:maxiter1
         project_G!(state, Gp, G)
         s = norm(Gp)
@@ -224,9 +223,8 @@ function _rotate(
             end
         end
 
-        if verbose
-            @info "Current optimization state:" iteration = i criterion = Q alpha = alpha
-        end
+        @logmsg loglevel "Current optimization state:" iteration = i criterion = Q alpha =
+            alpha
 
         iteration_state = IterationState(alpha, maxiter2, Q)
         push!(state.iterations, iteration_state)
@@ -247,13 +245,12 @@ function initialize(
     ::Type{RT},
     init,
     A::AbstractMatrix{TV};
-    verbose,
+    loglevel,
 ) where {RT<:RotationType,TV}
     _, k = size(A)
 
     if isnothing(init)
-        verbose &&
-            @info "No initial values provided. Using identity matrix as starting value."
+        @logmsg loglevel "No initial values provided. Using identity matrix as starting value."
         T = Matrix{TV}(I, k, k)
     else
         T = init
