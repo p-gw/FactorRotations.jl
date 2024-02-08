@@ -31,6 +31,7 @@ Varimax
 ## User Interface
 
 ```@docs
+setverbosity!
 rotate
 rotate!
 isorthogonal
