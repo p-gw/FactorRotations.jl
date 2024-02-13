@@ -30,9 +30,7 @@ struct Varimax <: RotationMethod{Orthogonal} end
 
 function criterion_and_gradient(::Varimax, Λ::AbstractMatrix)
     Λsq = Λ .^ 2
-    colmeans = mean(Λsq, dims = 1)
-    Λsq_demeaned = Λsq .- colmeans
-    Q = -norm(Λsq_demeaned)^2 / 4
-    ∇Q = @. -Λ * Λsq_demeaned
+    Q = -norm(Λsq)^2 / 4
+    ∇Q = @. -Λ * Λsq
     return Q, ∇Q
 end
