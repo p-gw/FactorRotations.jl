@@ -24,3 +24,15 @@ function random_orthogonal_matrix(n::Int)
     O = Q * Diagonal(sign.(diag(R)))
     return O
 end
+
+"""
+    centercols!(m::AbstractMatrix)
+
+Efficiently substract the column mean for each column in `m`.
+"""
+function centercols!(m::AbstractMatrix)
+    for col in eachcol(m)
+        col .-= mean(col)
+    end
+    return m
+end

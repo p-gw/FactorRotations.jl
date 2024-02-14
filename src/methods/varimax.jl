@@ -28,8 +28,14 @@ true
 """
 struct Varimax <: RotationMethod{Orthogonal} end
 
+function criterion(::Varimax, Λ::AbstractMatrix)
+    Q = -norm(Λ .^ 2)^2 / 4
+    return Q
+end
+
 function criterion_and_gradient(::Varimax, Λ::AbstractMatrix)
     Λsq = Λ .^ 2
+    centercols!(Λsq)
     Q = -norm(Λsq)^2 / 4
     ∇Q = @. -Λ * Λsq
     return Q, ∇Q

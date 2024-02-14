@@ -42,7 +42,7 @@ element.
 """
 function criterion_and_gradient(method::RotationMethod, Λ::AbstractMatrix)
     Q = criterion(method, Λ)
-    ∇Q = gradient(Reverse, x -> criterion(method, x), Λ)
+    ∇Q = gradient(Reverse, Base.Fix1(criterion, method), Λ)
     return Q, ∇Q
 end
 
