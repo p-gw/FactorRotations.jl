@@ -25,4 +25,10 @@
 
         setverbosity!(false)  # disable logging for following tests
     end
+
+    @testset "centercols!" begin
+        x = [1 2; 1 2]
+        @test FactorRotations.centercols!(copy(x)) ≈ x .- mean(x, dims = 1)
+        @test FactorRotations.centercols!(x) == [0 0; 0 0]
+    end
 end

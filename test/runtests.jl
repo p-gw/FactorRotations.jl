@@ -1,5 +1,6 @@
 using FactorRotations
 using LinearAlgebra
+using Statistics
 using Test
 
 A = [
