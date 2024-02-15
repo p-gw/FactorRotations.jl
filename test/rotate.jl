@@ -25,8 +25,15 @@
     @test_nowarn rotate(A, Varimax(), randomstarts = 3)
 
     # convergence
-    @test_throws ConvergenceError rotate(ones(8, 2), Oblimin(gamma = 2.0))
-    @test_throws ConvergenceError rotate(ones(8, 2), Oblimin(gamma = 2.0), randomstarts = 3)
+    struct NonConverging <: RotationMethod{Orthogonal} end
+
+    function FactorRotations.criterion_and_gradient(::NonConverging, m::AbstractMatrix)
+        return (1.0, ones(size(m)))
+    end
+
+    @test_throws ConvergenceError rotate(A, NonConverging())
+    @test_throws ConvergenceError rotate(A, NonConverging(), randomstarts = 3)
+
     @test_warn "did not converge" rotate(
         ones(8, 2),
         LinearRightConstant(1.0),
