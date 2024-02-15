@@ -24,6 +24,15 @@
 
     @test_nowarn rotate(A, Varimax(), randomstarts = 3)
 
+    # convergence
+    @test_throws ConvergenceError rotate(ones(8, 2), Oblimin(gamma = 2.0))
+    @test_throws ConvergenceError rotate(ones(8, 2), Oblimin(gamma = 2.0), randomstarts = 3)
+    @test_warn "did not converge" rotate(
+        ones(8, 2),
+        LinearRightConstant(1.0),
+        randomstarts = true,
+    )
+
     @testset "parse_randomstarts" begin
         @test FactorRotations.parse_randomstarts(true) == 100
         @test FactorRotations.parse_randomstarts(true; default = 10) == 10

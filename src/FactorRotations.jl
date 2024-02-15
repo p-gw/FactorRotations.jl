@@ -15,6 +15,7 @@ export setverbosity!
 export FactorRotation, loadings, rotation, factor_correlation
 export rotate, rotate!
 export criterion, criterion_and_gradient
+export ConvergenceError
 
 export kaiser_normalize, kaiser_denormalize
 export kaiser_normalize!, kaiser_denormalize!

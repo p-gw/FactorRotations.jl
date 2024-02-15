@@ -105,7 +105,7 @@ function rotate(Λ, method; verbose = VERBOSITY[], randomstarts = false, kwargs.
         Q_min = Inf
         rotation = initialize(rotation_type(method), nothing, Λ; loglevel = Logging.Debug)
         n_diverged = 0
-        n_at_Q_min = 1
+        n_at_Q_min = 0
 
         for _ in 1:starts
             init = random_orthogonal_matrix(size(Λ, 2))
@@ -114,7 +114,7 @@ function rotate(Λ, method; verbose = VERBOSITY[], randomstarts = false, kwargs.
             catch err
                 if err isa ConvergenceError
                     n_diverged += 1
-                    break
+                    continue
                 else
                     rethrow()
                 end
@@ -133,10 +133,18 @@ function rotate(Λ, method; verbose = VERBOSITY[], randomstarts = false, kwargs.
         end
 
         @logmsg loglevel "Finished $(starts) rotations with random starts."
-        @logmsg loglevel "$(n_at_Q_min) rotations converged to the same minimum value."
-        @logmsg loglevel "There were $(n_diverged) rotations that did not converge."
-    end
 
+
+        if n_diverged == starts
+            msg = "All $(starts) rotations did not converge. Please check the provided rotation method and/or loading matrix."
+            throw(ConvergenceError(msg))
+        elseif n_diverged > 0
+            @warn "There were $(n_diverged) rotations that did not converge. Please check the provided rotation method and/or loading matrix."
+        else
+            @logmsg loglevel "There were 0 rotations that did not converge."
+        end
+        @logmsg loglevel "$(n_at_Q_min) rotations converged to the same minimum value, Q = $(Q_min)"
+    end
 
     return FactorRotation(rotation.L, rotation.T)
 end
