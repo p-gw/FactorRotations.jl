@@ -24,6 +24,7 @@ export Orthogonal, Oblique
 export isorthogonal, isoblique
 
 export Biquartimax
+export Biquartimin
 export ComponentLoss, KatzRohlf, LinearRightConstant, Concave, Absolmin
 export CrawfordFerguson
 export Cubimax

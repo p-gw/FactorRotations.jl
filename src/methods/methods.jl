@@ -78,6 +78,23 @@ true
 """
 isoblique(method::RotationMethod) = method isa RotationMethod{Oblique}
 
+
+"""
+    rotation_type(::RotationMethod)
+
+Return the rotation type for a given rotation method.
+
+## Examples
+```jldoctest
+julia> rotation_type(Varimax())
+Orthogonal
+
+julia> rotation_type(Oblimin(gamma = 0.5))
+Oblique
+```
+"""
+rotation_type(::RotationMethod{RT}) where {RT} = RT
+
 include("biquartimax.jl")
 include("biquartimin.jl")
 include("component_loss.jl")

@@ -14,6 +14,25 @@
     rotate!(B, Quartimax())
     @test B == loadings(rotate(A, Quartimax()))
 
+    # random starts
+    @test_warn "Ignoring initial starting values" rotate(
+        A,
+        Varimax(),
+        randomstarts = 3,
+        init = I(2),
+    )
+
+    @test_nowarn rotate(A, Varimax(), randomstarts = 3)
+
+    @testset "parse_randomstarts" begin
+        @test FactorRotations.parse_randomstarts(true) == 100
+        @test FactorRotations.parse_randomstarts(true; default = 10) == 10
+        @test FactorRotations.parse_randomstarts(false) == 0
+        @test FactorRotations.parse_randomstarts(9) == 9
+        @test_throws ArgumentError FactorRotations.parse_randomstarts(-1)
+        @test_throws ArgumentError FactorRotations.parse_randomstarts(0)
+    end
+
     @testset "RotationState" begin
         orthogonal_state = FactorRotations.RotationState(Orthogonal, init, A)
         @test orthogonal_state.init == init
@@ -21,6 +40,7 @@
         @test orthogonal_state.T == init
         @test orthogonal_state.L == A * init
         @test orthogonal_state.iterations == FactorRotations.IterationState[]
+        @test isnan(FactorRotations.minimumQ(orthogonal_state))
 
         oblique_state = FactorRotations.RotationState(Oblique, init, A)
         @test oblique_state.init == init
@@ -29,6 +49,7 @@
         @test oblique_state.Ti == inv(init)
         @test oblique_state.L == A * inv(init)'
         @test oblique_state.iterations == FactorRotations.IterationState[]
+        @test isnan(FactorRotations.minimumQ(oblique_state))
     end
 
     @testset "gradient_f" begin

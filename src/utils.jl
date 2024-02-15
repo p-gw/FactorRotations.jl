@@ -36,3 +36,10 @@ function centercols!(m::AbstractMatrix)
     end
     return m
 end
+
+"""
+    ConvergenceError
+"""
+struct ConvergenceError <: Exception
+    msg::String
+end

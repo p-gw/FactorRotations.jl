@@ -53,14 +53,26 @@ Perform a rotation of the factor loading matrix `Λ` using a rotation `method`.
 ## Keyword arguments
 - `atol`: Sets the absolute tolerance for convergence of the algorithm (default: 1e-6).
 - `alpha`: Sets the inital value for alpha (default: 1).
+- `init`: A k-by-k matrix of starting values for the algorithm.
+          If `init = nothing` (the default), the identity matrix will be used as starting
+          values.
 - `maxiter1`: Controls the number of maximum iterations in the outer loop of the algorithm
               (default: 1000).
 - `maxiter2`: Controls the number of maximum iterations in the inner loop of the algorithm
               (default: 10).
-- `init`: A k-by-k matrix of starting values for the algorithm.
-          If `init = nothing` (the default), the identity matrix will be used as starting
-          values.
+- `randomstarts`: Determines if the algorithm should be started from random starting values.
+                  If `randomstarts = false` (the default), the algorithm is calculated once
+                  for the initial values provided by `init`.
+                  If `randomstarts = true`, the algorithm is started 100 times from random
+                  starting matrices.
+                  If `randomstarts = x::Int`, the algorithm is started `x` times from random
+                  starting matrices.
 - `verbose`: Print logging statements (default: false)
+
+## Return type
+The `rotate` function returns a [`FactorRotation`](@ref) object.
+If `randomstarts` were requested, then `rotate` returns the [`FactorRotation`](@ref) object
+with minimum criterion value.
 
 ## Examples
 ```jldoctest; filter = r"(\\d*)\\.(\\d{4})\\d+" => s"\\1.\\2"
@@ -79,14 +91,65 @@ FactorRotation{Float64} with loading matrix:
 
 ```
 """
-function rotate(Λ, method; verbose = VERBOSITY[], kwargs...)
+function rotate(Λ, method; verbose = VERBOSITY[], randomstarts = false, kwargs...)
     loglevel = verbose ? Logging.Info : Logging.Debug
-    rotation = _rotate(Λ, method; loglevel, kwargs...)
+    starts = parse_randomstarts(randomstarts)
 
-    @logmsg loglevel "Rotation algorithm converged after $(length(rotation.iterations)) iterations."
-    @logmsg loglevel "Final criterion value = $(last(rotation.iterations).Q)"
+    if starts == 0
+        rotation = _rotate(Λ, method; loglevel, kwargs...)
+    else
+        if :init in keys(kwargs)
+            @warn "Requested random starts but keyword argument `init` was provided. Ignoring initial starting values in `init`."
+        end
+
+        Q_min = Inf
+        rotation = initialize(rotation_type(method), nothing, Λ; loglevel = Logging.Debug)
+        n_diverged = 0
+        n_at_Q_min = 1
+
+        for _ in 1:starts
+            init = random_orthogonal_matrix(size(Λ, 2))
+            random_rotation = try
+                _rotate(Λ, method; loglevel, kwargs..., init)
+            catch err
+                if err isa ConvergenceError
+                    n_diverged += 1
+                    break
+                else
+                    rethrow()
+                end
+            end
+
+            Q_current = minimumQ(random_rotation)
+
+            if Q_current ≈ Q_min
+                n_at_Q_min += 1
+            elseif Q_current < Q_min
+                @logmsg loglevel "Found new minimum at Q = $(Q_current)"
+                n_at_Q_min = 1
+                Q_min = Q_current
+                rotation = random_rotation
+            end
+        end
+
+        @logmsg loglevel "Finished $(starts) rotations with random starts."
+        @logmsg loglevel "$(n_at_Q_min) rotations converged to the same minimum value."
+        @logmsg loglevel "There were $(n_diverged) rotations that did not converge."
+    end
+
 
     return FactorRotation(rotation.L, rotation.T)
+end
+
+function parse_randomstarts(x::Bool; default = 100)
+    starts = x ? default : 0
+    return starts
+end
+
+function parse_randomstarts(x::Int)
+    x > 0 && return x
+    msg = "Invalid value argument $(x) for `randomstarts`. Please provide an integer > 0 or set `randomstarts = true` to use the default."
+    throw(ArgumentError(msg))
 end
 
 function rotate(Λ, method::TandemCriteria; kwargs...)
@@ -168,6 +231,10 @@ function RotationState(T::Type{Oblique}, init, A)
     return RotationState{T,typeof(A)}(init, A, init, Ti, A * Ti', IterationState[])
 end
 
+function minimumQ(state::RotationState)
+    return length(state.iterations) > 0 ? last(state.iterations).Q : NaN
+end
+
 """
     _rotate(A::AbstractMatrix, method::RotationMethod{Orthogonal}; kwargs...)
 
@@ -230,7 +297,13 @@ function _rotate(
         push!(state.iterations, iteration_state)
     end
 
-    isconverged(s, atol) || error("Algorithm did not converge after $(maxiter1) iterations")
+    if !isconverged(s, atol)
+        msg = "Algorithm did not converge after $(maxiter1) iterations"
+        throw(ConvergenceError(msg))
+    end
+
+    @logmsg loglevel "Rotation algorithm converged after $(length(state.iterations)) iterations."
+    @logmsg loglevel "Final criterion value = $(ft)"
 
     return state
 end
