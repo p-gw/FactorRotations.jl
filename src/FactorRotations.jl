@@ -23,6 +23,7 @@ export kaiser_normalize!, kaiser_denormalize!
 export RotationMethod
 export Orthogonal, Oblique
 export isorthogonal, isoblique
+export rotation_type
 
 export Biquartimax
 export Biquartimin
