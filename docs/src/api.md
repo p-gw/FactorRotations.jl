@@ -13,6 +13,7 @@ Biquartimin
 ComponentLoss
 Concave
 CrawfordFerguson
+Geomin
 Infomax
 KatzRohlf
 LinearRightConstant
@@ -22,6 +23,7 @@ Oblimax
 Oblimin
 PatternSimplicity
 Quartimax
+Simplimax
 TandemCriteria
 TandemCriterionI
 TandemCriterionII
