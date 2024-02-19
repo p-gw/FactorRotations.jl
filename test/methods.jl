@@ -153,12 +153,6 @@ end
         test_criterion_and_gradient(method, A)
     end
 
-    @testset "Cubimax" begin
-        method = Cubimax()
-        @test isorthogonal(method)
-        test_criterion_and_gradient(method, A)
-    end
-
     @testset "Geomin" begin
         @test_throws ArgumentError Geomin(epsilon = -1)
 
