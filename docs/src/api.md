@@ -9,6 +9,7 @@ CurrentModule = FactorRotations
 ```@docs
 Absolmin
 Biquartimax
+Biquartimin
 ComponentLoss
 Concave
 CrawfordFerguson
@@ -36,6 +37,7 @@ rotate
 rotate!
 isorthogonal
 isoblique
+rotation_type
 loadings
 rotation
 factor_correlation
@@ -50,4 +52,5 @@ Orthogonal
 Oblique
 criterion
 criterion_and_gradient
+ConvergenceError
 ```
