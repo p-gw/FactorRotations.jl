@@ -20,7 +20,7 @@ Each implementation of `M <: RotationMethod` must implement at least one of the 
 - [`criterion`](@ref)
 - [`criterion_and_gradient`](@ref)
 
-If [`criterion`](@ref) is implemented, gradients are calculated by automatic differentiation.
+If only [`criterion`](@ref) is implemented, gradients are calculated by automatic differentiation.
 """
 abstract type RotationMethod{T<:RotationType} end
 
@@ -78,10 +78,27 @@ true
 """
 isoblique(method::RotationMethod) = method isa RotationMethod{Oblique}
 
+
+"""
+    rotation_type(::RotationMethod)
+
+Return the rotation type for a given rotation method.
+
+## Examples
+```jldoctest
+julia> rotation_type(Varimax())
+Orthogonal
+
+julia> rotation_type(Oblimin(gamma = 0.5))
+Oblique
+```
+"""
+rotation_type(::RotationMethod{RT}) where {RT} = RT
+
 include("biquartimax.jl")
+include("biquartimin.jl")
 include("component_loss.jl")
 include("crawford_ferguson.jl")
-include("cubimax.jl")
 include("geomin.jl")
 include("infomax.jl")
 include("minimum_entropy.jl")

@@ -15,6 +15,7 @@ export setverbosity!
 export FactorRotation, loadings, rotation, factor_correlation
 export rotate, rotate!
 export criterion, criterion_and_gradient
+export ConvergenceError
 
 export kaiser_normalize, kaiser_denormalize
 export kaiser_normalize!, kaiser_denormalize!
@@ -22,8 +23,10 @@ export kaiser_normalize!, kaiser_denormalize!
 export RotationMethod
 export Orthogonal, Oblique
 export isorthogonal, isoblique
+export rotation_type
 
 export Biquartimax
+export Biquartimin
 export ComponentLoss, KatzRohlf, LinearRightConstant, Concave, Absolmin
 export CrawfordFerguson
 export Cubimax
