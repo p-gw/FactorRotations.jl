@@ -40,6 +40,11 @@
         randomstarts = true,
     )
 
+    # normalize
+    B = copy(A)
+    rotate(B, Varimax(), normalize = true)
+    @test B == A
+
     @testset "parse_randomstarts" begin
         @test FactorRotations.parse_randomstarts(true) == 100
         @test FactorRotations.parse_randomstarts(true; default = 10) == 10
