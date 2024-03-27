@@ -34,24 +34,28 @@ Varimax
 ## User Interface
 
 ```@docs
-setverbosity!
+factor_correlation
+isoblique
+isorthogonal
+kaiser_denormalize
+kaiser_denormalize!
+kaiser_normalize
+kaiser_normalize!
+loadings
 rotate
 rotate!
-isorthogonal
-isoblique
-rotation_type
-loadings
 rotation
-factor_correlation
+rotation_type
+setverbosity!
 ```
 
 ## Internals
 
 ```@docs
 FactorRotation
-RotationMethod
-Orthogonal
 Oblique
+Orthogonal
+RotationMethod
 criterion
 criterion_and_gradient
 ConvergenceError

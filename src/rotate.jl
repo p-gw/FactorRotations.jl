@@ -7,15 +7,17 @@ A type holding results of a factor rotation.
 - `L`: The rotated factor loading matrix
 - `T`: The factor rotation matrix
 - `phi`: The factor correlation matrix
+- `weights`: Normalization weights
 """
 struct FactorRotation{T}
     L::Matrix{T}
     T::Matrix{T}
     phi::Matrix{T}
+    weights::Vector{T}
 end
 
-function FactorRotation(L, T)
-    return FactorRotation(L, T, T' * T)
+function FactorRotation(L, T, weights)
+    return FactorRotation(L, T, T' * T, weights)
 end
 
 function Base.show(io::IO, r::FactorRotation)
@@ -60,6 +62,7 @@ Perform a rotation of the factor loading matrix `Λ` using a rotation `method`.
               (default: 1000).
 - `maxiter2`: Controls the number of maximum iterations in the inner loop of the algorithm
               (default: 10).
+- `normalize`: Perform Kaiser normalization before rotation of the loading matrix (default: false).
 - `randomstarts`: Determines if the algorithm should be started from random starting values.
                   If `randomstarts = false` (the default), the algorithm is calculated once
                   for the initial values provided by `init`.
@@ -91,26 +94,42 @@ FactorRotation{Float64} with loading matrix:
 
 ```
 """
-function rotate(Λ, method; verbose = VERBOSITY[], randomstarts = false, kwargs...)
+function rotate(
+    Λ,
+    method;
+    verbose = VERBOSITY[],
+    randomstarts = false,
+    normalize = false,
+    kwargs...,
+)
     loglevel = verbose ? Logging.Info : Logging.Debug
     starts = parse_randomstarts(randomstarts)
 
+    # pre-processing
+    if normalize
+        @logmsg loglevel "Performing Kaiser normalization of loading matrix."
+        L, weights = kaiser_normalize(Λ)
+    else
+        L, weights = Λ, ones(eltype(Λ), size(Λ, 1))
+    end
+
+    # rotation
     if starts == 0
-        rotation = _rotate(Λ, method; loglevel, kwargs...)
+        rotation = _rotate(L, method; loglevel, kwargs...)
     else
         if :init in keys(kwargs)
             @warn "Requested random starts but keyword argument `init` was provided. Ignoring initial starting values in `init`."
         end
 
         Q_min = Inf
-        rotation = initialize(rotation_type(method), nothing, Λ; loglevel = Logging.Debug)
+        rotation = initialize(rotation_type(method), nothing, L; loglevel = Logging.Debug)
         n_diverged = 0
         n_at_Q_min = 0
 
         for _ in 1:starts
-            init = random_orthogonal_matrix(size(Λ, 2))
+            init = random_orthogonal_matrix(size(L, 2))
             random_rotation = try
-                _rotate(Λ, method; loglevel, kwargs..., init)
+                _rotate(L, method; loglevel, kwargs..., init)
             catch err
                 if err isa ConvergenceError
                     n_diverged += 1
@@ -134,7 +153,6 @@ function rotate(Λ, method; verbose = VERBOSITY[], randomstarts = false, kwargs.
 
         @logmsg loglevel "Finished $(starts) rotations with random starts."
 
-
         if n_diverged == starts
             msg = "All $(starts) rotations did not converge. Please check the provided rotation method and/or loading matrix."
             throw(ConvergenceError(msg))
@@ -146,7 +164,13 @@ function rotate(Λ, method; verbose = VERBOSITY[], randomstarts = false, kwargs.
         @logmsg loglevel "$(n_at_Q_min) rotations converged to the same minimum value, Q = $(Q_min)"
     end
 
-    return FactorRotation(rotation.L, rotation.T)
+    # post-processing
+    if normalize
+        @logmsg loglevel "Denormalizing rotated loading matrix."
+        kaiser_denormalize!(rotation.L, weights)
+    end
+
+    return FactorRotation(rotation.L, rotation.T, weights)
 end
 
 function parse_randomstarts(x::Bool; default = 100)
