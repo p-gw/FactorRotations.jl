@@ -21,4 +21,5 @@ init = Matrix{Float64}(I, 2, 2)
     include("normalize.jl")
     include("methods.jl")
     include("rotate.jl")
+    include("reflect.jl")
 end

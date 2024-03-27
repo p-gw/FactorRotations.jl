@@ -34,6 +34,8 @@ julia> weights
 
 julia> L_norm ≈ L
 true
+
+```
 """
 function kaiser_normalize!(Λ::AbstractMatrix)
     weights = communalities(Λ)

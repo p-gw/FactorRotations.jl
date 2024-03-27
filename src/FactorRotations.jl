@@ -8,7 +8,7 @@ using Logging
 using SimpleUnPack
 using Statistics
 
-import LinearAlgebra: rotate!
+import LinearAlgebra: rotate!, reflect!
 
 export setverbosity!
 
@@ -16,6 +16,8 @@ export FactorRotation, loadings, rotation, factor_correlation
 export rotate, rotate!
 export criterion, criterion_and_gradient
 export ConvergenceError
+
+export reflect, reflect!
 
 export kaiser_normalize, kaiser_denormalize
 export kaiser_normalize!, kaiser_denormalize!
@@ -63,5 +65,6 @@ include("normalize.jl")
 include("rotation_types.jl")
 include("methods/methods.jl")
 include("rotate.jl")
+include("reflect.jl")
 
 end
