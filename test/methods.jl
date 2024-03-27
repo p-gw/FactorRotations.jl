@@ -46,6 +46,28 @@ end
         test_equivalence(A, Biquartimax(), Oblimin(gamma = 0.5, orthogonal = true); init)
     end
 
+    @testset "Biquartimin" begin
+        # Example 3.1 in Jennrich & Bentler (2011)
+        bifactorA = [
+            1.17 0.78 0.18
+            2.08 0.78 -0.22
+            1.17 0.78 0.18
+            2.15 -0.62 -0.08
+            1.23 -0.62 0.32
+            2.15 -0.62 -0.08
+        ]
+
+        # oblique case
+        method = Biquartimin()
+        @test isoblique(method)
+        test_criterion_and_gradient(method, bifactorA)
+
+        # orthogonal case
+        method = Biquartimin(orthogonal = true)
+        @test isorthogonal(method)
+        test_criterion_and_gradient(method, bifactorA)
+    end
+
     @testset "ComponentLoss" begin
         # orthogonal case
         method = ComponentLoss(abs2, orthogonal = true)
@@ -128,12 +150,6 @@ end
         # oblique case
         method = CrawfordFerguson(kappa = 0.5, orthogonal = false)
         @test isoblique(method)
-        test_criterion_and_gradient(method, A)
-    end
-
-    @testset "Cubimax" begin
-        method = Cubimax()
-        @test isorthogonal(method)
         test_criterion_and_gradient(method, A)
     end
 

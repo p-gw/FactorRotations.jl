@@ -9,9 +9,11 @@ CurrentModule = FactorRotations
 ```@docs
 Absolmin
 Biquartimax
+Biquartimin
 ComponentLoss
 Concave
 CrawfordFerguson
+Geomin
 Infomax
 KatzRohlf
 LinearRightConstant
@@ -21,6 +23,7 @@ Oblimax
 Oblimin
 PatternSimplicity
 Quartimax
+Simplimax
 TandemCriteria
 TandemCriterionI
 TandemCriterionII
@@ -42,6 +45,7 @@ loadings
 rotate
 rotate!
 rotation
+rotation_type
 setverbosity!
 ```
 
@@ -54,4 +58,5 @@ Orthogonal
 RotationMethod
 criterion
 criterion_and_gradient
+ConvergenceError
 ```
