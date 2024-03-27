@@ -42,6 +42,8 @@ kaiser_denormalize!
 kaiser_normalize
 kaiser_normalize!
 loadings
+reflect
+reflect!
 rotate
 rotate!
 rotation

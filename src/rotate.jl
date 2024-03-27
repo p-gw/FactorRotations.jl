@@ -70,7 +70,9 @@ Perform a rotation of the factor loading matrix `Λ` using a rotation `method`.
                   starting matrices.
                   If `randomstarts = x::Int`, the algorithm is started `x` times from random
                   starting matrices.
-- `verbose`: Print logging statements (default: false)
+- `reflect`: Switch signs of the columns of the rotated loading matrix such that the sum of
+             loadings is non-negative for all columns (default: true)
+- `verbose`: Print logging statements (default: true)
 
 ## Return type
 The `rotate` function returns a [`FactorRotation`](@ref) object.
@@ -100,6 +102,7 @@ function rotate(
     verbose = VERBOSITY[],
     randomstarts = false,
     normalize = false,
+    reflect = true,
     kwargs...,
 )
     loglevel = verbose ? Logging.Info : Logging.Debug
@@ -170,7 +173,11 @@ function rotate(
         kaiser_denormalize!(rotation.L, weights)
     end
 
-    return FactorRotation(rotation.L, rotation.T, weights)
+    rot = FactorRotation(rotation.L, rotation.T, weights)
+
+    reflect && reflect!(rot)
+
+    return rot
 end
 
 function parse_randomstarts(x::Bool; default = 100)
