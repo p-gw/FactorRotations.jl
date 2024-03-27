@@ -91,10 +91,24 @@ FactorRotation{Float64} with loading matrix:
 
 ```
 """
-function rotate(Λ, method; verbose = VERBOSITY[], randomstarts = false, kwargs...)
+function rotate(
+    Λ,
+    method;
+    verbose = VERBOSITY[],
+    randomstarts = false,
+    normalize = false,
+    kwargs...,
+)
     loglevel = verbose ? Logging.Info : Logging.Debug
     starts = parse_randomstarts(randomstarts)
 
+    # pre-processing
+    if normalize
+        @logmsg loglevel "Performing Kaiser normalization of loading matrix."
+        _, weights = kaiser_normalize!(Λ)
+    end
+
+    # rotation
     if starts == 0
         rotation = _rotate(Λ, method; loglevel, kwargs...)
     else
@@ -134,7 +148,6 @@ function rotate(Λ, method; verbose = VERBOSITY[], randomstarts = false, kwargs.
 
         @logmsg loglevel "Finished $(starts) rotations with random starts."
 
-
         if n_diverged == starts
             msg = "All $(starts) rotations did not converge. Please check the provided rotation method and/or loading matrix."
             throw(ConvergenceError(msg))
@@ -144,6 +157,12 @@ function rotate(Λ, method; verbose = VERBOSITY[], randomstarts = false, kwargs.
             @logmsg loglevel "There were 0 rotations that did not converge."
         end
         @logmsg loglevel "$(n_at_Q_min) rotations converged to the same minimum value, Q = $(Q_min)"
+    end
+
+    # post-processing
+    if normalize
+        @logmsg loglevel "Denormalizing rotated loading matrix."
+        kaiser_denormalize!(rotation.L, weights)
     end
 
     return FactorRotation(rotation.L, rotation.T)
