@@ -184,17 +184,6 @@ function parse_randomstarts(x::Int)
     throw(ArgumentError(msg))
 end
 
-function parse_randomstarts(x::Bool; default = 100)
-    starts = x ? default : 0
-    return starts
-end
-
-function parse_randomstarts(x::Int)
-    x > 0 && return x
-    msg = "Invalid value argument $(x) for `randomstarts`. Please provide an integer > 0 or set `randomstarts = true` to use the default."
-    throw(ArgumentError(msg))
-end
-
 function rotate(Λ, method::TandemCriteria; kwargs...)
     rotation_1 = rotate(Λ, TandemCriterionI(); kwargs...)
     reduced_loading_matrix = loadings(rotation_1)[:, 1:method.keep]
