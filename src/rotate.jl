@@ -136,6 +136,7 @@ function rotate(
                 _rotate(L, method; loglevel, kwargs..., init)
             catch err
                 if err isa ConvergenceError
+                    @logmsg loglevel err.msg
                     n_diverged += 1
                     continue
                 else
@@ -340,7 +341,7 @@ function _rotate(
     end
 
     if !isconverged(s, atol)
-        msg = "Algorithm did not converge after $(maxiter1) iterations"
+        msg = "Algorithm did not converge after $(maxiter1) iterations (|∇G|=$(s) > $(atol))"
         throw(ConvergenceError(msg))
     end
 
