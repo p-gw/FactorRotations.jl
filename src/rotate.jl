@@ -73,6 +73,7 @@ Perform a rotation of the factor loading matrix `Λ` using a rotation `method`.
 - `reflect`: Switch signs of the columns of the rotated loading matrix such that the sum of
              loadings is non-negative for all columns (default: true)
 - `verbose`: Print logging statements (default: true)
+- `logperiod`: How frequently to report the optimization state (default: 100).
 
 ## Return type
 The `rotate` function returns a [`FactorRotation`](@ref) object.
@@ -288,6 +289,7 @@ function _rotate(
     maxiter1 = 1000,
     maxiter2 = 10,
     init::Union{Nothing,AbstractMatrix} = nothing,
+    logperiod::Integer = 100,
     loglevel,
 ) where {RT,TV<:Real}
     @logmsg loglevel "Initializing rotation using algorithm $(typeof(method))."
@@ -329,6 +331,7 @@ function _rotate(
             end
         end
 
+        (i == 1 || i == maxiter1 || mod(i, logperiod) == 0) &&
         @logmsg loglevel "Current optimization state:" iteration = i criterion = Q alpha =
             alpha
 
