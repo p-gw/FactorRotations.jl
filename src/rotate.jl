@@ -104,6 +104,7 @@ function rotate(
     randomstarts = false,
     normalize = false,
     reflect = true,
+    atol = 1e-6,
     kwargs...,
 )
     loglevel = verbose ? Logging.Info : Logging.Debug
@@ -119,7 +120,7 @@ function rotate(
 
     # rotation
     if starts == 0
-        rotation = _rotate(L, method; loglevel, kwargs...)
+        rotation = _rotate(L, method; atol, loglevel, kwargs...)
     else
         if :init in keys(kwargs)
             @warn "Requested random starts but keyword argument `init` was provided. Ignoring initial starting values in `init`."
@@ -133,7 +134,7 @@ function rotate(
         for _ in 1:starts
             init = random_orthogonal_matrix(size(L, 2))
             random_rotation = try
-                _rotate(L, method; loglevel, kwargs..., init)
+                _rotate(L, method; atol, loglevel, kwargs..., init)
             catch err
                 if err isa ConvergenceError
                     @logmsg loglevel err.msg
@@ -146,7 +147,7 @@ function rotate(
 
             Q_current = minimumQ(random_rotation)
 
-            if Q_current ≈ Q_min
+            if isapprox(Q_current, Q_min; atol)
                 n_at_Q_min += 1
             elseif Q_current < Q_min
                 @logmsg loglevel "Found new minimum at Q = $(Q_current)"
