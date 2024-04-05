@@ -108,7 +108,7 @@ end
         @test_throws ArgumentError Concave(0)
         @test_throws ArgumentError Concave(-2)
 
-        method = Absolmin(0)
+        method = Absolmin(1e-5)
         @test isoblique(method)
         test_criterion_and_gradient(method, A)
         @test_throws ArgumentError Absolmin(-1.0)
