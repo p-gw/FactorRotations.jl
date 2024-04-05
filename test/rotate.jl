@@ -76,34 +76,44 @@
         @test_throws "Unsupported rotation type BadRotation" FactorRotations.RotationState(BadRotation, init, A)
     end
 
-    @testset "gradient_f" begin
+    @testset "gradient_f!" begin
         orthogonal_state = FactorRotations.RotationState(Orthogonal, init, A)
-        @test FactorRotations.gradient_f(orthogonal_state, zeros(size(A))) ==
+        g = fill!(similar(init), NaN)
+        @test g === FactorRotations.gradient_f!(g, orthogonal_state, zeros(size(A)))
+        @test FactorRotations.gradient_f!(g, orthogonal_state, zeros(size(A))) ==
               zeros(size(init))
 
         oblique_state = FactorRotations.RotationState(Oblique, init, A)
-        @test FactorRotations.gradient_f(oblique_state, zeros(size(A))) == zeros(size(init))
+        fill!(g, NaN)
+        @test g === FactorRotations.gradient_f!(g, oblique_state, zeros(size(A)))
+        @test FactorRotations.gradient_f!(g, oblique_state, zeros(size(A))) == zeros(size(init))
     end
 
     @testset "project_G!" begin
         Gp = zeros(Float64, size(init))
         G = rand(size(init)...)
         orthogonal_state = FactorRotations.RotationState(Orthogonal, init, A)
-        @test FactorRotations.project_G!(orthogonal_state, Gp, G) != zeros(size(init))
+        @test Gp === FactorRotations.project_G!(Gp, orthogonal_state, G)
+        @test FactorRotations.project_G!(Gp, orthogonal_state, G) != zeros(size(init))
         @test Gp != zeros(size(init))
 
         Gp = zeros(Float64, size(init))
         oblique_state = FactorRotations.RotationState(Oblique, init, A)
-        @test FactorRotations.project_G!(oblique_state, Gp, G) != zeros(size(init))
+        @test Gp === FactorRotations.project_G!(Gp, oblique_state, G)
+        @test FactorRotations.project_G!(Gp, oblique_state, G) != zeros(size(init))
         @test Gp != zeros(size(init))
     end
 
-    @testset "project_X" begin
+    @testset "project_X!" begin
         state = FactorRotations.RotationState(Orthogonal, init, A)
-        @test FactorRotations.project_X(state, I(2)) == I(2)
+        X = fill!(similar(init), NaN)
+        @test X === FactorRotations.project_X!(X, state, I(2))
+        @test FactorRotations.project_X!(X, state, I(2)) == I(2)
 
         state = FactorRotations.RotationState(Oblique, init, A)
-        @test FactorRotations.project_X(state, I(2)) == I(2)
+        fill!(X, NaN)
+        @test X === FactorRotations.project_X!(X, state, I(2))
+        @test FactorRotations.project_X!(X, state, I(2)) == I(2)
     end
 
     @testset "update_state!" begin
