@@ -1,5 +1,5 @@
 function test_criterion_and_gradient(method, Λ)
-    Q, ∇Q = criterion_and_gradient(method, Λ)
+    Q, ∇Q = @inferred(criterion_and_gradient(method, Λ))
 
     @test Q isa Real
     @test ∇Q isa AbstractMatrix{<:Real}
@@ -16,12 +16,12 @@ function test_criterion_and_gradient(method, Λ)
 end
 
 function test_rotate(method, Λ; init)
-    rot = rotate(Λ, method; init)
+    rot = @inferred(rotate(Λ, method; init))
     p, k = size(Λ)
 
-    @test size(loadings(rot)) == (p, k)
-    @test size(rotation(rot)) == (k, k)
-    @test size(factor_correlation(rot)) == (k, k)
+    @test size(@inferred(loadings(rot))) == (p, k)
+    @test size(@inferred(rotation(rot))) == (k, k)
+    @test size(@inferred(factor_correlation(rot))) == (k, k)
     @test loadings(rot) * rotation(rot)' ≈ Λ
 
     if isorthogonal(method)
