@@ -29,7 +29,9 @@ true
 struct Varimax <: RotationMethod{Orthogonal} end
 
 function criterion(::Varimax, Λ::AbstractMatrix)
-    Q = -norm(Λ .^ 2)^2 / 4
+    Λsq = Λ .^ 2
+    centercols!(Λsq)
+    Q = -norm(Λsq)^2 / 4
     return Q
 end
 
