@@ -16,21 +16,27 @@ abstract type RotationMethod{T<:RotationType} end
 
 Calculate the criterion of a given `method` with respect to the factor loading matrix `Λ`.
 """
-function criterion end
+criterion(method::RotationMethod, Λ::AbstractMatrix{<:Real}) = criterion_and_gradient!(nothing, method, Λ)
 
 """
-    criterion_and_gradient(method::RotationMethod, Λ::AbstractMatrix{<:Real})
+    criterion_and_gradient!(∇Q::Union{AbstractMatrix{<:Real}, Nothing},
+                            method::RotationMethod, Λ::AbstractMatrix{<:Real})
 
-Calculate the criterion and gradient of a given `method` with respect to the factor loading
-matrix `Λ`.
+Calculate the quality criterion *Q* and the gradient of a given `method`
+with respect to the factor loading matrix `Λ`.
+The gradient is output into `∇Q`.
+The *∇Q* calculation is skipped if `∇Q = nothing`.
 
-Returns a Tuple with the criterion value as the first element and gradient as the second
-element.
+Returns the *Q* criterion value.
 """
-function criterion_and_gradient(method::RotationMethod, Λ::AbstractMatrix)
-    Q = criterion(method, Λ)
-    ∇Q = gradient(Reverse, Base.Fix1(criterion, method), Λ)
-    return Q, ∇Q
+criterion_and_gradient!
+
+# fallback method that uses AutoDiff
+function criterion_and_gradient!(∇Q, method::RotationMethod, Λ::AbstractMatrix)
+    if !isnothing(∇Q)
+        gradient!(Reverse, ∇Q, Base.Fix1(criterion, method), Λ)
+    end
+    return criterion(method, Λ)
 end
 
 """

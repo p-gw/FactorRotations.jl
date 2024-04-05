@@ -28,12 +28,15 @@ struct Oblimax{T} <: RotationMethod{T}
     end
 end
 
-function criterion_and_gradient(::Oblimax, Λ::AbstractMatrix)
-    sqnorm_Λsq = norm(Λ .^ 2) .^ 2
-    norm_Λ = norm(Λ)
+function criterion_and_gradient!(∇Q, ::Oblimax, Λ::AbstractMatrix)
+    sqnorm_Λsq = sum(x -> x^4, Λ)
+    sqnorm_Λ = norm(Λ)^2
 
-    K = sqnorm_Λsq / norm_Λ^4
+    K = sqnorm_Λsq / sqnorm_Λ^2
     Q = -log(K)
-    ∇Q = -4Λ .^ 3 / sqnorm_Λsq + 4Λ / norm_Λ^2
-    return Q, ∇Q
+    if !isnothing(∇Q)
+        ∇Q .= Λ .^ 3
+        axpby!(4/sqnorm_Λ, Λ, -4/sqnorm_Λsq, ∇Q)
+    end
+    return Q
 end

@@ -27,8 +27,9 @@
     # convergence
     struct NonConverging <: RotationMethod{Orthogonal} end
 
-    function FactorRotations.criterion_and_gradient(::NonConverging, m::AbstractMatrix)
-        return (1.0, ones(size(m)))
+    function FactorRotations.criterion_and_gradient!(∇Q, ::NonConverging, m::AbstractMatrix)
+        isnothing(∇Q) || fill!(∇Q, one(eltype(∇Q)))
+        return 1.0
     end
 
     @test_throws ConvergenceError rotate(A, NonConverging())

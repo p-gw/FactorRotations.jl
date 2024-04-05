@@ -5,7 +5,7 @@ The Minimum Entropy Ratio rotation method.
 """
 struct MinimumEntropyRatio <: RotationMethod{Orthogonal} end
 
-function criterion_and_gradient(::MinimumEntropyRatio, Λ::AbstractMatrix{T}) where {T}
+function criterion_and_gradient!(∇Q, ::MinimumEntropyRatio, Λ::AbstractMatrix{T}) where {T}
     p, k = size(Λ)
     Λsq = Λ .^ 2
 
@@ -17,6 +17,7 @@ function criterion_and_gradient(::MinimumEntropyRatio, Λ::AbstractMatrix{T}) wh
     Q₁ = sum(mxlogx, Λsq / colsums)
     Q₂ = sum(mxlogx, p₂)
     Q = log(Q₁) - log(Q₂)
+    isnothing(∇Q) && return Q
 
     u = Ones(T, p)
     v = Ones(T, k)
@@ -30,7 +31,7 @@ function criterion_and_gradient(::MinimumEntropyRatio, Λ::AbstractMatrix{T}) wh
     h = @. -(log(p₂) + 1)
     α = h * p₂'
     G₂ = u * h / total - α .* u * v'
-    ∇Q = @. 2Λ * (G₁ / Q₁ - G₂ / Q₂)
+    @. ∇Q = 2Λ * (G₁ / Q₁ - G₂ / Q₂)
 
-    return Q, ∇Q
+    return Q
 end

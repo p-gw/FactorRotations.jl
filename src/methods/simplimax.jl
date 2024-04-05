@@ -11,19 +11,14 @@ struct Simplimax <: RotationMethod{Oblique}
     end
 end
 
-function criterion(method::Simplimax, Λ::AbstractMatrix)
-    Λsq = Λ .^ 2
-    λm = nthsmallest(Λsq, method.m)
-    Q = tr(Λsq' * (Λsq .<= λm)) / 2
-    return Q
-end
-
-function criterion_and_gradient(method::Simplimax, Λ::AbstractMatrix)
+function criterion_and_gradient!(∇Q, method::Simplimax, Λ::AbstractMatrix)
     Λsq = Λ .^ 2
     λm = nthsmallest(Λsq, method.m)
     Λind = Λsq .<= λm
 
     Q = tr(Λsq' * Λind) / 2
-    ∇Q = Λ .* Λind
-    return Q, ∇Q
+    if !isnothing(∇Q)
+        ∇Q .= Λ .* Λind
+    end
+    return Q
 end

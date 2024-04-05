@@ -1,16 +1,17 @@
 function test_criterion_and_gradient(method, Λ)
-    Q, ∇Q = @inferred(criterion_and_gradient(method, Λ))
-
+    ∇Q = fill!(similar(Λ), NaN)
+    Q = @inferred(criterion_and_gradient!(∇Q, method, Λ))
     @test Q isa Real
-    @test ∇Q isa AbstractMatrix{<:Real}
-    @test size(∇Q) == size(Λ)
+    @test all(isfinite, ∇Q)
 
-    # test the criterion() method if available
-    if applicable(criterion, method, Λ)
-        Q2 = criterion(method, Λ)
-        @test Q2 isa Real
-        @test Q ≈ Q2
-    end
+	# test criterion-only calculation
+    Q2 = @inferred(criterion_and_gradient!(nothing, method, Λ))
+    @test Q2 == Q
+
+    # test criterion() wrapper
+    Q3 = @inferred(criterion(method, Λ))
+    @test Q3 isa Real
+    @test Q3 == Q
 
     return nothing
 end
@@ -252,7 +253,7 @@ end
     end
 
     @testset "TargetRotation" begin
-        @test_throws ArgumentError criterion_and_gradient(TargetRotation([0 1; 1 0]), A)
+        @test_throws ArgumentError criterion_and_gradient!(similar(A), TargetRotation([0 1; 1 0]), A)
 
         # orthogonal + complete case
         method = TargetRotation(similar(A), orthogonal = true)

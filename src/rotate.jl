@@ -305,7 +305,8 @@ function _rotate(
 ) where {RT,TV<:Real}
     @logmsg loglevel "Initializing rotation using algorithm $(typeof(method))."
     state = initialize(RT, init, A; loglevel)
-    Q, ∇Q = criterion_and_gradient(method, state.L)
+    ∇Q = similar(state.L)
+    Q = criterion_and_gradient!(∇Q, method, state.L)
 
     @logmsg loglevel "Initial criterion value = $(Q)"
 
@@ -334,7 +335,7 @@ function _rotate(
             project_X!(Tt, state, X)
             update_state!(state, Tt)
 
-            Q, ∇Q = criterion_and_gradient(method, state.L)
+            Q = criterion_and_gradient!(∇Q, method, state.L)
 
             if (Q < ft - 0.5 * s^2 * α)
                 # update state.T (and reuse the old one for the next iteration)
