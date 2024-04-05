@@ -4,14 +4,14 @@ function test_criterion_and_gradient(method, Λ)
     @test Q isa Real
     @test ∇Q isa AbstractMatrix{<:Real}
     @test size(∇Q) == size(Λ)
+
     # test the criterion() method if available
-    try
+    if applicable(criterion, method, Λ)
         Q2 = criterion(method, Λ)
         @test Q2 isa Real
         @test Q ≈ Q2
-    catch e
-        isa(e, MethodError) || rethrow(e)
     end
+
     return nothing
 end
 
