@@ -33,9 +33,9 @@ function test_equivalence(Λ, m1::RotationMethod, m2::RotationMethod; kwargs...)
     r1 = rotate(Λ, m1; kwargs...)
     r2 = rotate(Λ, m2; kwargs...)
 
-    @test isapprox(loadings(r1), loadings(r2), atol = 1e-5)
-    @test isapprox(rotation(r1), rotation(r2), atol = 1e-5)
-    @test isapprox(factor_correlation(r1), factor_correlation(r2), atol = 1e-5)
+    @test loadings(r1) ≈ loadings(r2) atol = 1e-5
+    @test rotation(r1) ≈ rotation(r2) atol = 1e-5
+    @test factor_correlation(r1) ≈ factor_correlation(r2) atol = 1e-5
 end
 
 @testset "factor rotation methods" begin
