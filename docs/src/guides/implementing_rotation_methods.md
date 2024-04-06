@@ -30,14 +30,13 @@ julia> struct MyQuartimax <: RotationMethod{Orthogonal} end
 
 ```
 
-## Gradient free methods
-If no gradients are available, the easiest way to define a rotation method is to implement [`criterion`](@ref).
-FactorRotations.jl will then use [Automatic Differentiation](https://en.wikipedia.org/wiki/Automatic_differentiation) to derive the gradients for your method.
+## Defining the rotation quality criterion
+The easiest way to define a rotation method is to implement the [`FactorRotations.criterion_only`](@ref) function, which calculates the rotation quality criterion.
 
 ```jldoctest implementing_rotation_methods
-julia> import FactorRotations: criterion
+julia> import FactorRotations: criterion_only
 
-julia> function criterion(method::MyQuartimax, Λ::AbstractMatrix)
+julia> function criterion_only(method::MyQuartimax, Λ::AbstractMatrix)
            return -sum(Λ .^ 4)
        end;
 
@@ -48,11 +47,28 @@ julia> criterion(MyQuartimax(), ones(10, 2))
 !!! note
     Since the algorithm in this package minimizes the criterion value, we have to make sure to return `-sum(...)` instead of the original criterion for Quartimax. 
 
-Once implemented, the required gradients for rotation will be automatically supplied by FactorRotations.jl.
+*FactorRotations.jl* will apply [Automatic Differentiation](https://en.wikipedia.org/wiki/Automatic_differentiation) to derive the gradient for your quality criterion
+and use it during rotation optimization.
 
 ```jldoctest implementing_rotation_methods
-julia> criterion_and_gradient(MyQuartimax(), ones(10, 2))
-(-20.0, [-4.0 -4.0; -4.0 -4.0; … ; -4.0 -4.0; -4.0 -4.0])
+julia> grad = fill(NaN, 10, 2);
+
+julia> criterion_and_gradient!(grad, MyQuartimax(), ones(10, 2))
+-20.0
+
+julia> grad
+10×2 Matrix{Float64}:
+ -4.0  -4.0
+ -4.0  -4.0
+ -4.0  -4.0
+ -4.0  -4.0
+ -4.0  -4.0
+ -4.0  -4.0
+ -4.0  -4.0
+ -4.0  -4.0
+ -4.0  -4.0
+ -4.0  -4.0
+
 ```
 
 ```jldoctest implementing_rotation_methods; filter = r"([0-9]*)\.([0-9]{4})[0-9]+" => s"\1.\2"
@@ -101,31 +117,53 @@ julia> isapprox(loadings(L_rotated), loadings(L_reference), atol = 1e-5)
 true
 ```
 
-## Methods with gradients
-When gradients are available it can be helpful to implementing them directly.
-In this case [`criterion_and_gradient`](@ref) can be directly implemented.
-This can be beneficial for example if computation can be reused between the calculation of the criterion and its gradient.
+## Defining the rotation quality gradient
+When the gradient formula is available, calculating both the criterion and its gradient
+can be implemented via the [`criterion_and_gradient!`](@ref) method.
+This allows reusing intermediate computations between the criterion and its gradient,
+as well as providing more efficient gradient calculation than the autodiff-based one.
+
+`criterion_and_gradient!` expects its first argument to be either an array for in-place gradient calculation,
+or `nothing` if gradient calculation should be skipped.
 
 Continuing the example of `MyQuartimax`:
 
 ```jldoctest implementing_rotation_methods
-julia> import FactorRotations: criterion_and_gradient
+julia> import FactorRotations: criterion_and_gradient!
 
-julia> function criterion_and_gradient(method::MyQuartimax, Λ::AbstractMatrix)
-           Q = criterion(method, Λ)
-           ∇Q = -Λ.^3
-           return Q, ∇Q
+julia> function criterion_and_gradient!(∇Q::Union{AbstractMatrix, Nothing}, method::MyQuartimax, Λ::AbstractMatrix)
+           Q = -sum(Λ .^ 4)
+           if !isnothing(∇Q)
+               ∇Q .= -Λ.^3
+           end
+           return Q
        end;
 ```
 
-Evaluating the function will now use the newly defined method, 
+User-defined `criterion_and_gradient!` has priority over the default autodiff-based one:
 
 ```jldoctest implementing_rotation_methods
-julia> criterion_and_gradient(MyQuartimax(), ones(10, 2))
-(-20.0, [-1.0 -1.0; -1.0 -1.0; … ; -1.0 -1.0; -1.0 -1.0])
+julia> grad = fill(NaN, 10, 2);
+
+julia> criterion_and_gradient!(grad, MyQuartimax(), ones(10, 2))
+-20.0
+
+julia> grad
+10×2 Matrix{Float64}:
+ -1.0  -1.0
+ -1.0  -1.0
+ -1.0  -1.0
+ -1.0  -1.0
+ -1.0  -1.0
+ -1.0  -1.0
+ -1.0  -1.0
+ -1.0  -1.0
+ -1.0  -1.0
+ -1.0  -1.0
+
 ```
 
-Again, this method can be simply used with [`rotate`](@ref), now using the custom [`criterion_and_gradient`](@ref).
+[`rotate`](@ref) will now also use the custom [`criterion_and_gradient!`](@ref):
 
 ```jldoctest implementing_rotation_methods; filter = r"([0-9]*)\.([0-9]{4})[0-9]+" => s"\1.\2"
 julia> L_rotated = rotate(L, MyQuartimax())

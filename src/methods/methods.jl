@@ -3,11 +3,9 @@
 
 An abstract type representing a factor rotation method.
 
-Each implementation of `M <: RotationMethod` must implement at least one of the following methods:
-- [`criterion`](@ref)
-- [`criterion_and_gradient`](@ref)
-
-If only [`criterion`](@ref) is implemented, gradients are calculated by automatic differentiation.
+Each implementation of `M <: RotationMethod` must implement one of the following methods:
+- [`criterion_only`](@ref)
+- [`criterion_and_gradient!`](@ref)
 """
 abstract type RotationMethod{T<:RotationType} end
 
@@ -15,6 +13,8 @@ abstract type RotationMethod{T<:RotationType} end
     criterion(method::RotationMethod, Λ::Abstractmatrix{<:Real})
 
 Calculate the criterion of a given `method` with respect to the factor loading matrix `Λ`.
+
+The method is just a wrapper for a [`criterion_and_gradient!(nothing, method, Λ)`](@ref criterion_and_gradient!) call.
 """
 criterion(method::RotationMethod, Λ::AbstractMatrix{<:Real}) = criterion_and_gradient!(nothing, method, Λ)
 
@@ -22,22 +22,31 @@ criterion(method::RotationMethod, Λ::AbstractMatrix{<:Real}) = criterion_and_gr
     criterion_and_gradient!(∇Q::Union{AbstractMatrix{<:Real}, Nothing},
                             method::RotationMethod, Λ::AbstractMatrix{<:Real})
 
-Calculate the quality criterion *Q* and the gradient of a given `method`
+Calculate the quality criterion *Q* and its gradient for a given `method`
 with respect to the factor loading matrix `Λ`.
-The gradient is output into `∇Q`.
-The *∇Q* calculation is skipped if `∇Q = nothing`.
+The gradient is output into `∇Q` matrix, which should have the same dimensions as `Λ`.
+The `∇Q` calculation is skipped if `∇Q ≡ nothing`.
 
 Returns the *Q* criterion value.
 """
 criterion_and_gradient!
 
+"""
+    criterion_only(method::RotationMethod, Λ::AbstractMatrix{<:Real})
 
-# RotationMethod that relies on AutoDiff for gradient evaluation
-# should implement criterion_only() method instead of criterion_and_gradient!()
+Internal method to calculate the quality criterion *Q* for a given `method`
+with respect to the factor loading matrix `Λ`.
+
+Implementing `criterion_only()` is an easier alternative to writing [`criterion_and_gradient!`](@ref).
+In this case *FactorRotations.jl* would use the fallback implementation of `criterion_and_gradient!()`
+that calculates the gradient using automatic differentiation.
+When both `criterion_only()` and `criterion_and_gradient!()` are defined for a specific rotation method,
+only `criterion_and_gradient!()` would be called by [`rotate`](@ref) or [`criterion`](@ref).
+"""
 criterion_only(method::RotationMethod, Λ::AbstractMatrix) =
     error("$(typeof(method)) does not implement neither criterion_and_gradient!() nor criterion_only() methods.")
 
-# fallback method that uses AutoDiff
+# fallback method that applies auto-diff to criterion_only() call
 function criterion_and_gradient!(∇Q, method::RotationMethod, Λ::AbstractMatrix)
     if !isnothing(∇Q)
         gradient!(Reverse, ∇Q, Base.Fix1(criterion_only, method), Λ)
