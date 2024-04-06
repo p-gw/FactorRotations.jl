@@ -71,6 +71,9 @@
         @test oblique_state.L == A * inv(init)'
         @test oblique_state.iterations == FactorRotations.IterationState[]
         @test isnan(FactorRotations.minimumQ(oblique_state))
+
+        struct BadRotation <: FactorRotations.RotationType end
+        @test_throws "Unsupported rotation type BadRotation" FactorRotations.RotationState(BadRotation, init, A)
     end
 
     @testset "gradient_f" begin

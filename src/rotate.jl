@@ -259,22 +259,27 @@ A struct that holds the state of the rotation algorithm.
 - `iterations`: A vector of [`IterationState`](@ref) that holds iteration states of the
                 optimization.
 """
-mutable struct RotationState{RT<:RotationType,T<:AbstractMatrix}
+mutable struct RotationState{RT<:RotationType,T<:AbstractMatrix,S<:IterationState}
     init::T
     A::T
     T::T
     Ti::Union{Nothing,T}
     L::T
-    iterations::Vector{IterationState}
+    iterations::Vector{S}
 end
 
-function RotationState(T::Type{Orthogonal}, init, A)
-    return RotationState{T,typeof(A)}(init, A, init, nothing, A * init, IterationState[])
-end
-
-function RotationState(T::Type{Oblique}, init, A)
-    Ti = inv(init)
-    return RotationState{T,typeof(A)}(init, A, init, Ti, A * Ti', IterationState[])
+function RotationState(::Type{T}, init, A) where T <: RotationType
+    if T <: Orthogonal
+        Ti = nothing
+        L = A * init
+    elseif T <: Oblique
+        Ti = inv(init)
+        L = A * Ti'
+    else
+        throw(ArgumentError("Unsupported rotation type $(T)"))
+    end
+    S = IterationState{eltype(A),eltype(A)}
+    return RotationState{T,typeof(A),S}(init, A, init, Ti, L, S[])
 end
 
 function minimumQ(state::RotationState)
@@ -311,6 +316,8 @@ function _rotate(
     Gp = similar(state.T)
     s = zero(eltype(G))
 
+    α = Float64(alpha) # for type stability
+
     @logmsg loglevel "Starting optimization..."
     for i in 1:maxiter1
         project_G!(state, Gp, G)
@@ -318,30 +325,29 @@ function _rotate(
 
         isconverged(s, g_atol) && break
 
-        alpha *= 2
+        α *= 2
 
         for _ in 1:maxiter2
-            X = state.T - alpha * Gp
+            X = state.T - α * Gp
             Tt = project_X(state, X)
             update_state!(state, Tt)
 
             Q, ∇Q = criterion_and_gradient(method, state.L)
 
-            if (Q < ft - 0.5 * s^2 * alpha)
+            if (Q < ft - 0.5 * s^2 * α)
                 state.T = Tt
                 ft = Q
                 G = gradient_f(state, ∇Q)
                 break
             else
-                alpha /= 2
+                α /= 2
             end
         end
 
         (i == 1 || i == maxiter1 || mod(i, logperiod) == 0) &&
-            @logmsg loglevel "Current optimization state:" iteration = i criterion = Q alpha =
-                alpha
+            @logmsg loglevel "Current optimization state:" iteration = i criterion = Q alpha = α
 
-        iteration_state = IterationState(alpha, maxiter2, Q)
+        iteration_state = IterationState(α, maxiter2, Q)
         push!(state.iterations, iteration_state)
     end
 
