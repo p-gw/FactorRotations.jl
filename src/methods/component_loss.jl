@@ -7,7 +7,7 @@ Implementing a custom component loss `T` requires that `T <: AbstractComponentLo
 """
 abstract type AbstractComponentLoss{RT} <: RotationMethod{RT} end
 
-criterion(method::AbstractComponentLoss, Λ::AbstractMatrix{<:Real}) = -sum(method.loss, Λ)
+criterion_only(method::AbstractComponentLoss, Λ::AbstractMatrix{<:Real}) = -sum(method.loss, Λ)
 
 """
     ComponentLoss(loss::Function; orthogonal = false)

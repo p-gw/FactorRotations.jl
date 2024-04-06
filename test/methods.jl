@@ -343,4 +343,12 @@ end
             init,
         )
     end
+
+    @testset "Missing criterion implementation" begin
+        struct NoCriterion <: RotationMethod{Orthogonal} end
+
+        @test_throws "NoCriterion does not implement" criterion(NoCriterion(), randn(6, 6))
+        # Enzyme.jl would refuse to autodiff because it detects that fallback criterion_only() throws an error
+        @test_throws "Function to differentiate" criterion_and_gradient!(randn(6, 5), NoCriterion(), randn(6, 5))
+    end
 end

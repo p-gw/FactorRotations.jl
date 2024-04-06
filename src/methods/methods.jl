@@ -31,12 +31,18 @@ Returns the *Q* criterion value.
 """
 criterion_and_gradient!
 
+
+# RotationMethod that relies on AutoDiff for gradient evaluation
+# should implement criterion_only() method instead of criterion_and_gradient!()
+criterion_only(method::RotationMethod, Λ::AbstractMatrix) =
+    error("$(typeof(method)) does not implement neither criterion_and_gradient!() nor criterion_only() methods.")
+
 # fallback method that uses AutoDiff
 function criterion_and_gradient!(∇Q, method::RotationMethod, Λ::AbstractMatrix)
     if !isnothing(∇Q)
-        gradient!(Reverse, ∇Q, Base.Fix1(criterion, method), Λ)
+        gradient!(Reverse, ∇Q, Base.Fix1(criterion_only, method), Λ)
     end
-    return criterion(method, Λ)
+    return criterion_only(method, Λ)
 end
 
 """
