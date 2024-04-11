@@ -16,7 +16,7 @@ function criterion_and_gradient!(∇Q::OptionalGradient, method::Simplimax, Λ::
     λm = nthsmallest(Λsq, method.m)
     Λind = Λsq .<= λm
 
-    Q = tr(Λsq' * Λind) / 2
+    Q = dot(Λsq, Λind) / 2
     if !isnothing(∇Q)
         ∇Q .= Λ .* Λind
     end
