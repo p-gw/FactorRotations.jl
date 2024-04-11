@@ -19,7 +19,7 @@ MultivariateStats = "6f286f6a-111f-5878-ab1e-185364afe411"
 MultivariateStatsExt = "MultivariateStats"
 
 [compat]
-Enzyme = "0.11"
+Enzyme = "0.11, 0.12"
 FillArrays = "1"
 LogExpFunctions = "0.3"
 MultivariateStats = "0.10"
