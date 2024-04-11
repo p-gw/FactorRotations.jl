@@ -14,7 +14,7 @@ struct PatternSimplicity{RT} <: RotationMethod{RT}
     end
 end
 
-function criterion_and_gradient!(∇Q, method::PatternSimplicity, Λ::AbstractMatrix)
+function criterion_and_gradient!(∇Q::OptionalGradient, method::PatternSimplicity, Λ::AbstractMatrix)
     Λsq = Λ .^ 2
     m = Λsq' * Λsq
     diag_m = diagm(diag(m))

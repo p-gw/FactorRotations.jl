@@ -3,9 +3,8 @@
 
 An abstract type representing a factor rotation method.
 
-Each implementation of `M <: RotationMethod` must implement one of the following methods:
-- [`criterion_only`](@ref)
-- [`criterion_and_gradient!`](@ref)
+Each implementation of `M <: RotationMethod` must provide [`criterion_and_gradient!`](@ref)
+method.
 """
 abstract type RotationMethod{T<:RotationType} end
 
@@ -31,27 +30,16 @@ Returns the *Q* criterion value.
 """
 criterion_and_gradient!
 
-"""
-    criterion_only(method::RotationMethod, Λ::AbstractMatrix{<:Real})
+OptionalGradient = Union{AbstractMatrix, Nothing}
 
-Internal method to calculate the quality criterion *Q* for a given `method`
-with respect to the factor loading matrix `Λ`.
-
-Implementing `criterion_only()` is an easier alternative to writing [`criterion_and_gradient!`](@ref).
-In this case *FactorRotations.jl* would use the fallback implementation of `criterion_and_gradient!()`
-that calculates the gradient using automatic differentiation.
-When both `criterion_only()` and `criterion_and_gradient!()` are defined for a specific rotation method,
-only `criterion_and_gradient!()` would be called by [`rotate`](@ref) or [`criterion`](@ref).
-"""
-criterion_only(method::RotationMethod, Λ::AbstractMatrix) =
-    error("$(typeof(method)) does not implement neither criterion_and_gradient!() nor criterion_only() methods.")
-
-# fallback method that applies auto-diff to criterion_only() call
-function criterion_and_gradient!(∇Q, method::RotationMethod, Λ::AbstractMatrix)
+# fallback method that applies auto-diff to criterion() call
+function criterion_and_gradient!(∇Q::OptionalGradient, method::RotationMethod, Λ::AbstractMatrix)
     if !isnothing(∇Q)
-        gradient!(Reverse, ∇Q, Base.Fix1(criterion_only, method), Λ)
+        gradient!(Reverse, ∇Q, Base.Fix1(criterion, method), Λ)
+    else
+        error("$(typeof(method)) does not implement neither criterion_and_gradient!(∇Q, ...) nor criterion_and_gradient!(nothing, ...) methods.")
     end
-    return criterion_only(method, Λ)
+    return criterion(method, Λ)
 end
 
 """

@@ -5,7 +5,7 @@ The first criterion of the tandem criteria factor rotation method.
 """
 struct TandemCriterionI <: RotationMethod{Orthogonal} end
 
-function criterion_and_gradient!(∇Q, method::TandemCriterionI, Λ::AbstractMatrix)
+function criterion_and_gradient!(∇Q::OptionalGradient, method::TandemCriterionI, Λ::AbstractMatrix)
     Λsq = Λ .^ 2
     ΛxΛ = Λ * Λ'
     part = ΛxΛ .^ 2 * Λsq
@@ -23,7 +23,7 @@ The second criterion of the tandem criteria factor rotation method.
 """
 struct TandemCriterionII <: RotationMethod{Orthogonal} end
 
-function criterion_and_gradient!(∇Q, method::TandemCriterionII, Λ::AbstractMatrix)
+function criterion_and_gradient!(∇Q::OptionalGradient, method::TandemCriterionII, Λ::AbstractMatrix)
     p, k = size(Λ)
     u = Ones(p)
     Λsq = Λ .^ 2

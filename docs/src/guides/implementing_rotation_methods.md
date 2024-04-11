@@ -6,17 +6,17 @@ If you wish to implement your own factor rotation method or extend this package,
 - Implementing a rotation method with gradients
 
 In the following guide we will walk through both ways of implementing a rotation method.
-As an example we will reimplement [`Quartimax`](@ref), which minimizes 
+As an example we will reimplement [`Quartimax`](@ref), which minimizes
 
 ```math
 Q = \sum_p \sum_k \lambda_{pk}^4
 ```
 
-where ``p`` and ``k`` are the row and column indices of factor loading matrix ``\Lambda`` and ``\lambda_{pk}`` are the entries of the factor loading matrix. 
+where ``p`` and ``k`` are the row and column indices of factor loading matrix ``\Lambda`` and ``\lambda_{pk}`` are the entries of the factor loading matrix.
 
 The first step to a custom implementation is to define a new `struct` for the rotation method.
 FactorRotations.jl requires that all rotation methods inherit from [`RotationMethod`](@ref).
-One must also specify whether the new method can be used for orthogonal rotation, oblique rotation, or both. 
+One must also specify whether the new method can be used for orthogonal rotation, oblique rotation, or both.
 For orthogonal rotation it is required that `T <: RotationMethod{Orthogonal}`.
 Oblique rotations must satisfy `T <: RotationMethod{Oblique}`.
 Methods that can be used for both orthogonal and oblique rotation are defined `T{RT} <: RotationMethod{RT}`.
@@ -31,12 +31,16 @@ julia> struct MyQuartimax <: RotationMethod{Orthogonal} end
 ```
 
 ## Defining the rotation quality criterion
-The easiest way to define a rotation method is to implement the [`FactorRotations.criterion_only`](@ref) function, which calculates the rotation quality criterion.
+The easiest way to define a rotation method is to implement the
+[`criterion_and_gradient!(::Nothing, ...)`](@ref criterion_and_gradient!) function,
+which calculates the rotation quality criterion.
+`nothing` fixed as the first argument specifies that
+this implementation does not calculate the criterion gradient.
 
 ```jldoctest implementing_rotation_methods
-julia> import FactorRotations: criterion_only
+julia> import FactorRotations: criterion_and_gradient!
 
-julia> function criterion_only(method::MyQuartimax, Λ::AbstractMatrix)
+julia> function criterion_and_gradient!(::Nothing, method::MyQuartimax, Λ::AbstractMatrix)
            return -sum(Λ .^ 4)
        end;
 
@@ -45,7 +49,7 @@ julia> criterion(MyQuartimax(), ones(10, 2))
 ```
 
 !!! note
-    Since the algorithm in this package minimizes the criterion value, we have to make sure to return `-sum(...)` instead of the original criterion for Quartimax. 
+    Since the algorithm in this package minimizes the criterion value, we have to make sure to return `-sum(...)` instead of the original criterion for Quartimax.
 
 *FactorRotations.jl* will apply [Automatic Differentiation](https://en.wikipedia.org/wiki/Automatic_differentiation) to derive the gradient for your quality criterion
 and use it during rotation optimization.
@@ -83,7 +87,7 @@ julia> L = [
            0.647  0.333
        ];
 
-julia> L_rotated = rotate(L, MyQuartimax()) 
+julia> L_rotated = rotate(L, MyQuartimax())
 FactorRotation{Float64} with loading matrix:
 8×2 Matrix{Float64}:
  0.898755  0.194824
@@ -118,13 +122,14 @@ true
 ```
 
 ## Defining the rotation quality gradient
-When the gradient formula is available, calculating both the criterion and its gradient
-can be implemented via the [`criterion_and_gradient!`](@ref) method.
-This allows reusing intermediate computations between the criterion and its gradient,
-as well as providing more efficient gradient calculation than the autodiff-based one.
+When the gradient formula is available, [`criterion_and_gradient!`](@ref) method
+could be modified to allow `∇Q::AbstractMatrix` as the first argument.
+In this case *FactorRotations.jl* will expect that the `criterion_and_gradient!(∇Q, method, Λ)` call
+sets `∇Q` to the ``∇Q(Λ)`` in-place and also returns ``Q(Λ)``.
 
-`criterion_and_gradient!` expects its first argument to be either an array for in-place gradient calculation,
-or `nothing` if gradient calculation should be skipped.
+This variant of `criterion_and_gradient!` allows reusing intermediate computations between
+the criterion and its gradient, as well as providing more efficient gradient calculation
+than the autodiff-based one.
 
 Continuing the example of `MyQuartimax`:
 
@@ -180,4 +185,12 @@ FactorRotation{Float64} with loading matrix:
 
 julia> isapprox(loadings(L_rotated), loadings(L_reference), atol = 1e-5)
 true
+```
+
+Note that in our `criterion_and_gradient!` method gradient calculation is optional
+and could be skipped by passing `nothing`. This variant of the method is used by [`criterion`](@ref):
+
+```jldoctest implementing_rotation_methods; filter = r"([0-9]*)\.([0-9]{4})[0-9]+" => s"\1.\2"
+julia> criterion(MyQuartimax(), L)
+-2.8829327011730004
 ```

@@ -37,7 +37,7 @@ struct CrawfordFerguson{T,V} <: RotationMethod{T}
     end
 end
 
-function criterion_and_gradient!(∇Q, method::CrawfordFerguson, Λ::AbstractMatrix{T}) where {T}
+function criterion_and_gradient!(∇Q::OptionalGradient, method::CrawfordFerguson, Λ::AbstractMatrix{T}) where {T}
     @unpack κ = method
     p, k = size(Λ)
 

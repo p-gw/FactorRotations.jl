@@ -28,7 +28,7 @@ true
 """
 struct Quartimax <: RotationMethod{Orthogonal} end
 
-function criterion_and_gradient!(∇Q, method::Quartimax, Λ::AbstractMatrix)
+function criterion_and_gradient!(∇Q::OptionalGradient, method::Quartimax, Λ::AbstractMatrix)
     if !isnothing(∇Q)
         @. ∇Q = -Λ^3
     end

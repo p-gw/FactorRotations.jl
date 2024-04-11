@@ -28,7 +28,7 @@ true
 """
 struct Varimax <: RotationMethod{Orthogonal} end
 
-function criterion_and_gradient!(∇Q, ::Varimax, Λ::AbstractMatrix)
+function criterion_and_gradient!(∇Q::OptionalGradient, ::Varimax, Λ::AbstractMatrix)
     Λsq = isnothing(∇Q) ? similar(Λ) : ∇Q
     Λsq .= Λ .^ 2
     centercols!(Λsq)

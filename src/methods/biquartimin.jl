@@ -14,7 +14,7 @@ struct Biquartimin{RT} <: RotationMethod{RT}
     end
 end
 
-function criterion_and_gradient!(∇Q, ::Biquartimin, Λ::AbstractMatrix)
+function criterion_and_gradient!(∇Q::OptionalGradient, ::Biquartimin, Λ::AbstractMatrix)
     p, k = size(Λ)
     n = k - 1
 

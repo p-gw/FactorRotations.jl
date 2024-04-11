@@ -14,7 +14,7 @@ struct Geomin{T} <: RotationMethod{Oblique}
     end
 end
 
-function criterion_and_gradient!(∇Q, method::Geomin, Λ::AbstractMatrix{T}) where {T}
+function criterion_and_gradient!(∇Q::OptionalGradient, method::Geomin, Λ::AbstractMatrix{T}) where {T}
     @unpack ε = method
     Λsq = Λ .^ 2 .+ ε
     p, k = size(Λ)

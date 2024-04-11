@@ -28,7 +28,7 @@ struct Oblimax{T} <: RotationMethod{T}
     end
 end
 
-function criterion_and_gradient!(∇Q, ::Oblimax, Λ::AbstractMatrix)
+function criterion_and_gradient!(∇Q::OptionalGradient, ::Oblimax, Λ::AbstractMatrix)
     sqnorm_Λsq = sum(x -> x^4, Λ)
     sqnorm_Λ = norm(Λ)^2
 

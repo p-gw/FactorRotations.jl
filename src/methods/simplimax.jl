@@ -11,7 +11,7 @@ struct Simplimax <: RotationMethod{Oblique}
     end
 end
 
-function criterion_and_gradient!(∇Q, method::Simplimax, Λ::AbstractMatrix)
+function criterion_and_gradient!(∇Q::OptionalGradient, method::Simplimax, Λ::AbstractMatrix)
     Λsq = Λ .^ 2
     λm = nthsmallest(Λsq, method.m)
     Λind = Λsq .<= λm
