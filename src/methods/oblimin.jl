@@ -40,20 +40,5 @@ struct Oblimin{T,V} <: RotationMethod{T}
     end
 end
 
-function criterion_and_gradient!(∇Q::OptionalGradient, method::Oblimin, Λ::AbstractMatrix{T}) where {T}
-    @unpack γ = method
-    p, k = size(Λ)
-    C = Fill(1 / p, p, p)
-    N = ones(T, k, k)
-    zerodiag!(N)
-
-    Λsq = Λ .^ 2
-
-    part = (I - γ * C) * Λsq * N
-
-    Q = tr(Λsq' * part) / 4
-    if !isnothing(∇Q)
-        ∇Q .= Λ .* part
-    end
-    return Q
-end
+criterion_and_gradient!(∇Q::OptionalGradient, method::Oblimin, Λ::AbstractMatrix{<:Real}) =
+    weighted_sums_criterion_and_gradient!(∇Q, Λ, 1 - method.γ, method.γ / size(Λ, 1))

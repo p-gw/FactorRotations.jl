@@ -50,6 +50,31 @@ function centercols!(m::AbstractMatrix)
     return m
 end
 
+# generic function for calculating the
+# criterion and the gradient of the method
+# based on the weighted sums of columns and rows
+function weighted_sums_criterion_and_gradient!(
+        ∇Q::Union{Nothing, AbstractMatrix},
+        Λ::AbstractMatrix{<:Real},
+        columns_weight::Number, rows_weight::Number
+)
+    Λsq = !isnothing(∇Q) ? ∇Q : similar(Λ)
+    Λsq .= Λ .^ 2
+
+    Λsq_rowsum = sum(Λsq, dims=1)
+    Λsq_colsum = sum(Λsq, dims=2)
+
+    Q = (columns_weight * sum(abs2, Λsq_colsum) + rows_weight * sum(abs2, Λsq_rowsum) - sum(abs2, Λsq)) / 4
+    if !isnothing(∇Q)
+        # ∇Q === Λsq
+        # weighted Λ² columns and rows sum at each position - Λ²
+        ∇Q .= (columns_weight .* Λsq_colsum) .+
+              (rows_weight .* Λsq_rowsum) .- Λsq
+        ∇Q .*= Λ
+    end
+    return Q
+end
+
 """
     ConvergenceError
 
