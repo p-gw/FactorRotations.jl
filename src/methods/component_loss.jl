@@ -81,7 +81,7 @@ end
 A component loss criterion with loss function
 
 ```math
-h(\\lambda) = 1 - \\exp(-(\\frac{\\lambda}{b})^2)
+h(\\lambda) = 1 - \\exp\\left(-\\left(\\frac{\\lambda}{b}\\right)^2\\right)
 ```
 
 where ``b`` is the bandwidth parameter.
