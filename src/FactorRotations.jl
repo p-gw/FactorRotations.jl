@@ -32,7 +32,9 @@ export Biquartimin
 export ComponentLoss, KatzRohlf, LinearRightConstant, Concave, Absolmin
 export CrawfordFerguson
 export Cubimax
+export Equamax
 export Geomin
+export Parsimax
 export PatternSimplicity
 export Infomax
 export MinimumEntropy
