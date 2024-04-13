@@ -1,27 +1,27 @@
 """
     Oblimin(; gamma, orthogonal = false)
 
-The family of Oblimin rotation methods.
+The family of *Oblimin* rotation methods.
 
 ## Keyword arguments
-- `gamma`: The shape parameter determining the rotation criterion (see Details).
+- `gamma`: The shape parameter determining the rotation criterion (see *Details*).
 - `orthogonal`: If `orthogonal = true` an orthogonal rotation is performed, an oblique
    rotation otherwise. (default: `false`)
 
 ## Details
-The Oblimin rotation family allow orthogonal as well as oblique rotation of the factor
-loading matrix. If orthogonal rotation is performed, Oblimin is equivalent to the following
+The *Oblimin* rotation family allows orthogonal as well as oblique rotation of the factor
+loading matrix. If orthogonal rotation is performed, *Oblimin* is equivalent to the following
 rotation methods given a value for `gamma`:
 
-- `gamma = 0` → [`Quartimax`](@ref)
-- `gamma = 0.5` → [`Biquartimax`](@ref)
-- `gamma = 1` → [`Varimax`](@ref)
-- `gamma = p/2` → Equamax
+- *γ = 0*: [`Quartimax`](@ref)
+- *γ = 1/2*: [`Biquartimax`](@ref)
+- *γ = 1*: [`Varimax`](@ref)
+- *γ = p/2*: [`Equamax`](@ref)
 
-For oblique rotation Oblimin is equivalent to the following rotation methods:
+For oblique rotation *Oblimin* is equivalent to the following rotation methods:
 
-- `gamma = 0` → Quartimin
-- `gamma = 0.5` → Biquartimin
+- *γ = 0*: *Quartimin*
+- *γ = 1/2*: [`Biquartimin`](@ref)
 
 ## Examples
 ```jldoctest
