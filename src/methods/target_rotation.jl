@@ -52,26 +52,34 @@ FactorRotation{Float64} with loading matrix:
  0.236852  0.68804
 ```
 """
-struct TargetRotation{T,V<:AbstractMatrix} <: RotationMethod{T}
-    H::V
-    W::BitMatrix
+struct TargetRotation{T,V<:AbstractMatrix,W<:Union{AbstractMatrix, Nothing}} <: RotationMethod{T}
+    target::V
+    weights::W
+
     function TargetRotation(target; orthogonal = false)
         T = orthogonal ? Orthogonal : Oblique
 
         # construct weight matrix assuming 'missing' are unspecified values
-        W = @. !ismissing(target)
-        H = coalesce.(target, 0)
+        if any(ismissing, target)
+            weights = @. !ismissing(target)
+            target = coalesce.(target, zero(nonmissingtype(eltype(target))))
+        else # no missing values, weights are not required
+            weights = nothing
+        end
 
-        return new{T,typeof(target)}(H, W)
+        return new{T,typeof(target),typeof(weights)}(target, weights)
     end
 end
 
 function criterion_and_gradient!(∇Q::OptionalGradient, method::TargetRotation, Λ::AbstractMatrix)
-    @unpack H, W = method
-    size(H) == size(Λ) ||
+    @unpack target, weights = method
+    size(target) == size(Λ) ||
         throw(ArgumentError("target matrix and loading matrix must be of equal size"))
     dQ = isnothing(∇Q) ? similar(Λ) : ∇Q
-    @. dQ = W * (Λ - H)
+    @. dQ = Λ - target
+    if !isnothing(weights)
+        @. dQ *= weights
+    end
     Q = norm(dQ)^2 / 2
     return Q
 end
