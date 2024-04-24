@@ -53,8 +53,10 @@ factor_correlation(r::FactorRotation) = r.phi
 Perform a rotation of the factor loading matrix `Λ` using a rotation `method`.
 
 ## Keyword arguments
-- `atol`: Sets the absolute tolerance for convergence of the algorithm (default: 1e-6).
 - `alpha`: Sets the inital value for alpha (default: 1).
+- `f_atol`: Sets the absolute tolerance for the comparison of minimum criterion values when
+            with random starts (default: 1e-6).
+- `g_atol`: Sets the absolute tolerance for convergence of the algorithm (default: 1e-6).
 - `init`: A k-by-k matrix of starting values for the algorithm.
           If `init = nothing` (the default), the identity matrix will be used as starting
           values.
@@ -64,8 +66,6 @@ Perform a rotation of the factor loading matrix `Λ` using a rotation `method`.
               (default: 10).
 - `normalize`: Perform Kaiser normalization before rotation of the loading matrix
                (default: false).
-- `qtol`: Sets the absolute tolerance for the comparison of minimum criterion values when
-          with random starts (default: 1e-6).
 - `randomstarts`: Determines if the algorithm should be started from random starting values.
                   If `randomstarts = false` (the default), the algorithm is calculated once
                   for the initial values provided by `init`.
@@ -107,8 +107,8 @@ function rotate(
     randomstarts = false,
     normalize = false,
     reflect = true,
-    atol = 1e-6,
-    qtol = 1e-6,
+    f_atol = 1e-6,
+    g_atol = 1e-6,
     kwargs...,
 )
     loglevel = verbose ? Logging.Info : Logging.Debug
@@ -124,7 +124,7 @@ function rotate(
 
     # rotation
     if starts == 0
-        rotation = _rotate(L, method; atol, loglevel, kwargs...)
+        rotation = _rotate(L, method; g_atol, loglevel, kwargs...)
     else
         if :init in keys(kwargs)
             @warn "Requested random starts but keyword argument `init` was provided. Ignoring initial starting values in `init`."
@@ -138,7 +138,7 @@ function rotate(
         for _ in 1:starts
             init = random_orthogonal_matrix(size(L, 2))
             random_rotation = try
-                _rotate(L, method; atol, loglevel, kwargs..., init)
+                _rotate(L, method; g_atol, loglevel, kwargs..., init)
             catch err
                 if err isa ConvergenceError
                     @logmsg loglevel err.msg
@@ -151,7 +151,7 @@ function rotate(
 
             Q_current = minimumQ(random_rotation)
 
-            if isapprox(Q_current, Q_min, atol = qtol)
+            if isapprox(Q_current, Q_min, atol = f_atol)
                 n_at_Q_min += 1
             elseif Q_current < Q_min
                 @logmsg loglevel "Found new minimum at Q = $(Q_current)"
@@ -290,7 +290,7 @@ orthogonal factor rotation.
 function _rotate(
     A::AbstractMatrix{TV},
     method::RotationMethod{RT};
-    atol = 1e-6,
+    g_atol = 1e-6,
     alpha = 1,
     maxiter1 = 1000,
     maxiter2 = 10,
@@ -316,7 +316,7 @@ function _rotate(
         project_G!(state, Gp, G)
         s = norm(Gp)
 
-        isconverged(s, atol) && break
+        isconverged(s, g_atol) && break
 
         alpha *= 2
 
@@ -345,8 +345,8 @@ function _rotate(
         push!(state.iterations, iteration_state)
     end
 
-    if !isconverged(s, atol)
-        msg = "Algorithm did not converge after $(maxiter1) iterations (|∇G|=$(s) > $(atol))"
+    if !isconverged(s, g_atol)
+        msg = "Algorithm did not converge after $(maxiter1) iterations (|∇G|=$(s) > $(g_atol))"
         throw(ConvergenceError(msg))
     end
 
@@ -445,8 +445,8 @@ function update_state!(state::RotationState{Oblique}, Tt)
 end
 
 """
-    isconverged(s, atol)
+    isconverged(s, g_atol)
 
 determines the convergence status of the algorithm.
 """
-isconverged(s, atol) = s < atol
+isconverged(s, g_atol) = s < g_atol

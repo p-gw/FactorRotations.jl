@@ -278,7 +278,7 @@ end
 
         # test that rotation result is identical published results by
         # Bernaards & Jennrich (2005) within the reported accuracy of 7 digits
-        Ar = rotate(A, Quartimax(); init, atol = 1e-5)
+        Ar = rotate(A, Quartimax(); init, g_atol = 1e-5)
         Ar = round.(loadings(Ar), digits = 7)
 
         pub = [
