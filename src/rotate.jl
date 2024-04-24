@@ -62,7 +62,10 @@ Perform a rotation of the factor loading matrix `Λ` using a rotation `method`.
               (default: 1000).
 - `maxiter2`: Controls the number of maximum iterations in the inner loop of the algorithm
               (default: 10).
-- `normalize`: Perform Kaiser normalization before rotation of the loading matrix (default: false).
+- `normalize`: Perform Kaiser normalization before rotation of the loading matrix
+               (default: false).
+- `qtol`: Sets the absolute tolerance for the comparison of minimum criterion values when
+          with random starts (default: 1e-6).
 - `randomstarts`: Determines if the algorithm should be started from random starting values.
                   If `randomstarts = false` (the default), the algorithm is calculated once
                   for the initial values provided by `init`.
@@ -105,6 +108,7 @@ function rotate(
     normalize = false,
     reflect = true,
     atol = 1e-6,
+    qtol = 1e-6,
     kwargs...,
 )
     loglevel = verbose ? Logging.Info : Logging.Debug
@@ -147,7 +151,7 @@ function rotate(
 
             Q_current = minimumQ(random_rotation)
 
-            if isapprox(Q_current, Q_min; atol)
+            if isapprox(Q_current, Q_min, atol = qtol)
                 n_at_Q_min += 1
             elseif Q_current < Q_min
                 @logmsg loglevel "Found new minimum at Q = $(Q_current)"
@@ -334,8 +338,8 @@ function _rotate(
         end
 
         (i == 1 || i == maxiter1 || mod(i, logperiod) == 0) &&
-        @logmsg loglevel "Current optimization state:" iteration = i criterion = Q alpha =
-            alpha
+            @logmsg loglevel "Current optimization state:" iteration = i criterion = Q alpha =
+                alpha
 
         iteration_state = IterationState(alpha, maxiter2, Q)
         push!(state.iterations, iteration_state)
