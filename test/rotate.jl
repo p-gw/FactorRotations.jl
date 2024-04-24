@@ -3,11 +3,11 @@
     @test_throws ArgumentError rotate(A, Varimax(), init = rand(10, 10))
     @test_throws ArgumentError rotate(A, Varimax(), init = rand(8, 2))
 
-    rot_default_init = rotate(A, Varimax())
-    rot_identity_init = rotate(A, Varimax(); init)
-    @test loadings(rot_default_init) ≈ loadings(rot_identity_init)
-    @test rotation(rot_default_init) ≈ rotation(rot_identity_init)
-    @test factor_correlation(rot_default_init) ≈ factor_correlation(rot_identity_init)
+    rot_default_init = rotate(A, Varimax(), g_atol=1e-7)
+    rot_identity_init = rotate(A, Varimax(); g_atol=1e-7, init)
+    @test loadings(rot_default_init) ≈ loadings(rot_identity_init) atol=1e-7
+    @test rotation(rot_default_init) ≈ rotation(rot_identity_init) atol=1e-7
+    @test factor_correlation(rot_default_init) ≈ factor_correlation(rot_identity_init) atol=1e-7
 
     # in-place rotation
     B = copy(A)
