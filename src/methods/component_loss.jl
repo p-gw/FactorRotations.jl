@@ -7,7 +7,13 @@ Implementing a custom component loss `T` requires that `T <: AbstractComponentLo
 """
 abstract type AbstractComponentLoss{RT} <: RotationMethod{RT} end
 
-criterion_and_gradient!(::Nothing, method::AbstractComponentLoss, Λ::AbstractMatrix{<:Real}) = -sum(method.loss, Λ)
+function criterion_and_gradient!(
+    ::Nothing,
+    method::AbstractComponentLoss,
+    Λ::AbstractMatrix{<:Real},
+)
+    return -sum(method.loss, Λ)
+end
 
 """
     ComponentLoss(loss::Function; orthogonal = false)
@@ -138,7 +144,7 @@ struct Concave{F} <: AbstractComponentLoss{Oblique}
 end
 
 """
-    Absolmin(epsilon = 0)
+    Absolmin(epsilon)
 
 The Absolmin component loss factor rotation criterion.
 It has the loss function
@@ -150,8 +156,8 @@ h(\\lambda) = |\\lambda|
 struct Absolmin{F} <: AbstractComponentLoss{Oblique}
     epsilon::Float64
     loss::F
-    function Absolmin(epsilon = 0)
-        epsilon >= 0 || throw(ArgumentError("epsilon must be non-negative"))
+    function Absolmin(epsilon)
+        epsilon > 0 || throw(ArgumentError("epsilon must be positive"))
         b = 1 / (2 * epsilon)
         a = epsilon - b * epsilon^2
         loss(x) = abs(x) > epsilon ? abs(x) : a + b * abs2(x)

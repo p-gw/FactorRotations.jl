@@ -4,7 +4,7 @@ function test_criterion_and_gradient(method, Λ)
     @test Q isa Real
     @test all(isfinite, ∇Q)
 
-	# test criterion-only calculation
+    # test criterion-only calculation
     Q2 = @inferred(criterion_and_gradient!(nothing, method, Λ))
     @test Q2 == Q
 
@@ -113,6 +113,7 @@ end
         @test isoblique(method)
         test_criterion_and_gradient(method, A)
         @test_throws ArgumentError Absolmin(-1.0)
+        @test_throws ArgumentError Absolmin(0)
     end
 
     @testset "CrawfordFerguson" begin
@@ -253,7 +254,11 @@ end
     end
 
     @testset "TargetRotation" begin
-        @test_throws ArgumentError criterion_and_gradient!(similar(A), TargetRotation([0 1; 1 0]), A)
+        @test_throws ArgumentError criterion_and_gradient!(
+            similar(A),
+            TargetRotation([0 1; 1 0]),
+            A,
+        )
 
         # orthogonal + complete case
         method = TargetRotation(similar(A), orthogonal = true)
@@ -303,17 +308,17 @@ end
         # loadings obtained with GPArotation v2024.3
         # quartimax(A, eps=1e-8, maxit=50000, randomStarts=10)
         gpa = [
-            0.8987545678868889   0.19482357840480186
-            0.9339434064715286   0.1297486551312077
-            0.9021314838553653   0.10386426641014213
-            0.8765082522883497   0.1712842189765975
-            0.31557202157519415  0.87647606881132
-            0.2511231928032839   0.7734889411208703
-            0.19800711751346906  0.7146783762042948
-            0.3078572424280441   0.6593344510069232
+            0.8987545678868889 0.19482357840480186
+            0.9339434064715286 0.1297486551312077
+            0.9021314838553653 0.10386426641014213
+            0.8765082522883497 0.1712842189765975
+            0.31557202157519415 0.87647606881132
+            0.2511231928032839 0.7734889411208703
+            0.19800711751346906 0.7146783762042948
+            0.3078572424280441 0.6593344510069232
         ]
 
-        @test FactorRotations.loadings(Ar) ≈ gpa atol=1e-6
+        @test FactorRotations.loadings(Ar) ≈ gpa atol = 1e-6
         @test criterion(Quartimax(), Ar.L) ≈ criterion(Quartimax(), gpa) atol = 1e-8
     end
 
@@ -349,6 +354,10 @@ end
 
         @test_throws "NoCriterion does not implement" criterion(NoCriterion(), randn(6, 6))
         # Enzyme.jl would refuse to autodiff because it detects that fallback criterion() throws an error
-        @test_throws "Function to differentiate" criterion_and_gradient!(randn(6, 5), NoCriterion(), randn(6, 5))
+        @test_throws "Function to differentiate" criterion_and_gradient!(
+            randn(6, 5),
+            NoCriterion(),
+            randn(6, 5),
+        )
     end
 end
