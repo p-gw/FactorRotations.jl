@@ -14,7 +14,7 @@ struct Biquartimin{RT} <: RotationMethod{RT}
     end
 end
 
-function criterion_and_gradient(::Biquartimin, Λ::AbstractMatrix)
+function criterion_and_gradient!(∇Q::OptionalGradient, ::Biquartimin, Λ::AbstractMatrix)
     p, k = size(Λ)
     n = k - 1
 
@@ -24,7 +24,11 @@ function criterion_and_gradient(::Biquartimin, Λ::AbstractMatrix)
 
     Q = sum(Λ₂sq .* (Λ₂sq * N))
 
-    ∇Q = zeros(size(Λ))
-    ∇Q[:, 2:end] .= 4 * Λ₂ .* (Λ₂sq * N)
-    return Q, ∇Q
+    if !isnothing(∇Q)
+        ∇Q[:, 1] .= zero(eltype(∇Q))
+        ∇Q₂ = @view ∇Q[:, 2:end]
+        ∇Q₂ .= Λ₂ .* (Λ₂sq * N)
+        lmul!(4, ∇Q)
+    end
+    return Q
 end

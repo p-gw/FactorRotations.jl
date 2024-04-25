@@ -28,17 +28,13 @@ true
 """
 struct Varimax <: RotationMethod{Orthogonal} end
 
-function criterion(::Varimax, Λ::AbstractMatrix)
-    Λsq = Λ .^ 2
+function criterion_and_gradient!(∇Q::OptionalGradient, ::Varimax, Λ::AbstractMatrix)
+    Λsq = isnothing(∇Q) ? similar(Λ) : ∇Q
+    Λsq .= Λ .^ 2
     centercols!(Λsq)
     Q = -norm(Λsq)^2 / 4
+    if !isnothing(∇Q)
+        @. ∇Q *= -Λ # ∇Q is already centered Λsq
+    end
     return Q
-end
-
-function criterion_and_gradient(::Varimax, Λ::AbstractMatrix)
-    Λsq = Λ .^ 2
-    centercols!(Λsq)
-    Q = -norm(Λsq)^2 / 4
-    ∇Q = @. -Λ * Λsq
-    return Q, ∇Q
 end

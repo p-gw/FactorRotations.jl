@@ -259,22 +259,27 @@ A struct that holds the state of the rotation algorithm.
 - `iterations`: A vector of [`IterationState`](@ref) that holds iteration states of the
                 optimization.
 """
-mutable struct RotationState{RT<:RotationType,T<:AbstractMatrix}
+mutable struct RotationState{RT<:RotationType,T<:AbstractMatrix,S<:IterationState}
     init::T
     A::T
     T::T
     Ti::Union{Nothing,T}
     L::T
-    iterations::Vector{IterationState}
+    iterations::Vector{S}
 end
 
-function RotationState(T::Type{Orthogonal}, init, A)
-    return RotationState{T,typeof(A)}(init, A, init, nothing, A * init, IterationState[])
-end
-
-function RotationState(T::Type{Oblique}, init, A)
-    Ti = inv(init)
-    return RotationState{T,typeof(A)}(init, A, init, Ti, A * Ti', IterationState[])
+function RotationState(::Type{T}, init, A) where T <: RotationType
+    if T <: Orthogonal
+        Ti = nothing
+        L = A * init
+    elseif T <: Oblique
+        Ti = inv(init)
+        L = A * Ti'
+    else
+        throw(ArgumentError("Unsupported rotation type $(T)"))
+    end
+    S = IterationState{eltype(A),eltype(A)}
+    return RotationState{T,typeof(A),S}(init, A, init, Ti, L, S[])
 end
 
 function minimumQ(state::RotationState)
@@ -300,48 +305,53 @@ function _rotate(
 ) where {RT,TV<:Real}
     @logmsg loglevel "Initializing rotation using algorithm $(typeof(method))."
     state = initialize(RT, init, A; loglevel)
-    Q, ∇Q = criterion_and_gradient(method, state.L)
+    ∇Q = similar(state.L)
+    Q = criterion_and_gradient!(∇Q, method, state.L)
 
     @logmsg loglevel "Initial criterion value = $(Q)"
 
     # preallocate variables to avoid unnecessary allocations
     ft = Q
-    G = gradient_f(state, ∇Q)
+    G = gradient_f!(similar(state.T), state, ∇Q)
+    X = similar(state.T)
     Tt = similar(state.T)
     Gp = similar(state.T)
     s = zero(eltype(G))
 
+    α = Float64(alpha) # for type stability
+
     @logmsg loglevel "Starting optimization..."
     for i in 1:maxiter1
-        project_G!(state, Gp, G)
+        project_G!(Gp, state, G)
         s = norm(Gp)
 
         isconverged(s, g_atol) && break
 
-        alpha *= 2
+        α *= 2
 
         for _ in 1:maxiter2
-            X = state.T - alpha * Gp
-            Tt = project_X(state, X)
+            copy!(X, state.T)
+            axpy!(-α, Gp, X)
+            project_X!(Tt, state, X)
             update_state!(state, Tt)
 
-            Q, ∇Q = criterion_and_gradient(method, state.L)
+            Q = criterion_and_gradient!(∇Q, method, state.L)
 
-            if (Q < ft - 0.5 * s^2 * alpha)
-                state.T = Tt
+            if (Q < ft - 0.5 * s^2 * α)
+                # update state.T (and reuse the old one for the next iteration)
+                Tt, state.T = state.T, Tt
                 ft = Q
-                G = gradient_f(state, ∇Q)
+                gradient_f!(G, state, ∇Q)
                 break
             else
-                alpha /= 2
+                α /= 2
             end
         end
 
         (i == 1 || i == maxiter1 || mod(i, logperiod) == 0) &&
-            @logmsg loglevel "Current optimization state:" iteration = i criterion = Q alpha =
-                alpha
+            @logmsg loglevel "Current optimization state:" iteration = i criterion = Q alpha = α
 
-        iteration_state = IterationState(alpha, maxiter2, Q)
+        iteration_state = IterationState(α, maxiter2, Q)
         push!(state.iterations, iteration_state)
     end
 
@@ -384,15 +394,15 @@ function initialize(
     return RotationState(RT, T, A)
 end
 
-function gradient_f(state::RotationState{Orthogonal}, ∇Q)
+function gradient_f!(G::AbstractMatrix, state::RotationState{Orthogonal}, ∇Q)
     @unpack A = state
-    G = A' * ∇Q
+    mul!(G, A', ∇Q)
     return G
 end
 
-function gradient_f(state::RotationState{Oblique}, ∇Q)
+function gradient_f!(G::AbstractMatrix, state::RotationState{Oblique}, ∇Q)
     @unpack L, Ti = state
-    G = -(L' * ∇Q * Ti)'
+    mul!(G, Ti', ∇Q' * L, -1, 0)
     return G
 end
 
@@ -401,34 +411,35 @@ end
 
 Compute the projection `Gp` of `G` and store the results in `Gp`.
 """
-function project_G!(state::RotationState{Orthogonal}, Gp, G)
+function project_G!(Gp, state::RotationState{Orthogonal}, G)
     @unpack T = state
     M = T' * G
-    S = (M + M') ./ 2
-    Gp .= G - T * S
+    S = M + M'
+    mul!(Gp, T, S, -0.5, 0)
+    axpy!(1, G, Gp)
     return Gp
 end
 
-function project_G!(state::RotationState{Oblique}, Gp, G)
+function project_G!(Gp, state::RotationState{Oblique}, G)
     @unpack T = state
     TG = T .* G
-    Gp .= G - T * diagm(vec(sum(TG, dims = 1)))
+    mul!(Gp, T, diagm(vec(sum(TG, dims = 1))), -1, 0)
+    axpy!(1, G, Gp)
     return Gp
 end
 
 """
 compute the projection `Tt` of `X`.
 """
-function project_X(state::RotationState{Orthogonal}, X)
+function project_X!(Tt, state::RotationState{Orthogonal}, X)
     @unpack U, Vt = svd(X)
-    Tt = U * Vt
+    mul!(Tt, U, Vt)
     return Tt
 end
 
-function project_X(state::RotationState{Oblique}, X)
-    Xsq = X .^ 2
-    v = 1 ./ sqrt.(sum(Xsq, dims = 1))
-    Tt = X * diagm(vec(v))
+function project_X!(Tt, state::RotationState{Oblique}, X)
+    v = inv.(sqrt.(sum(abs2, X, dims = 1)))
+    mul!(Tt, X, diagm(vec(v)))
     return Tt
 end
 

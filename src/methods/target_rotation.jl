@@ -66,11 +66,12 @@ struct TargetRotation{T,V<:AbstractMatrix} <: RotationMethod{T}
     end
 end
 
-function criterion_and_gradient(method::TargetRotation, Λ::AbstractMatrix)
+function criterion_and_gradient!(∇Q::OptionalGradient, method::TargetRotation, Λ::AbstractMatrix)
     @unpack H, W = method
     size(H) == size(Λ) ||
         throw(ArgumentError("target matrix and loading matrix must be of equal size"))
-    ∇Q = @. W * (Λ - H)
-    Q = norm(∇Q)^2 / 2
-    return Q, ∇Q
+    dQ = isnothing(∇Q) ? similar(Λ) : ∇Q
+    @. dQ = W * (Λ - H)
+    Q = norm(dQ)^2 / 2
+    return Q
 end

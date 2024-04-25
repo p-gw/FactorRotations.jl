@@ -5,18 +5,15 @@ The first criterion of the tandem criteria factor rotation method.
 """
 struct TandemCriterionI <: RotationMethod{Orthogonal} end
 
-function criterion(method::TandemCriterionI, Λ::AbstractMatrix)
-    Λsq = Λ .^ 2
-    return -tr(Λsq' * ((Λ * Λ') .^ 2 * Λsq))
-end
-
-function criterion_and_gradient(method::TandemCriterionI, Λ::AbstractMatrix)
+function criterion_and_gradient!(∇Q::OptionalGradient, method::TandemCriterionI, Λ::AbstractMatrix)
     Λsq = Λ .^ 2
     ΛxΛ = Λ * Λ'
     part = ΛxΛ .^ 2 * Λsq
-    Q = -tr(Λsq' * part)
-    ∇Q = -4 * Λ .* part - 4 * (ΛxΛ .* (Λsq * Λsq')) * Λ
-    return Q, ∇Q
+    if !isnothing(∇Q)
+        ∇Q .= Λ .* part .+ (ΛxΛ .* (Λsq * Λsq')) * Λ
+        lmul!(-4, ∇Q)
+    end
+    return -tr(Λsq' * part)
 end
 
 """
@@ -26,28 +23,18 @@ The second criterion of the tandem criteria factor rotation method.
 """
 struct TandemCriterionII <: RotationMethod{Orthogonal} end
 
-function criterion(method::TandemCriterionII, Λ::AbstractMatrix)
+function criterion_and_gradient!(∇Q::OptionalGradient, method::TandemCriterionII, Λ::AbstractMatrix)
     p, k = size(Λ)
     u = Ones(p)
     Λsq = Λ .^ 2
     ΛxΛ = Λ * Λ'
     ΛxΛsq = ΛxΛ .^ 2
     part = (u * u' - ΛxΛsq) * Λsq
-    Q = tr(Λsq' * part)
-    return Q
-end
-
-function criterion_and_gradient(method::TandemCriterionII, Λ::AbstractMatrix)
-    p, k = size(Λ)
-    u = Ones(p)
-    Λsq = Λ .^ 2
-    ΛxΛ = Λ * Λ'
-    ΛxΛsq = ΛxΛ .^ 2
-    part = (u * u' - ΛxΛsq) * Λsq
-    Q = tr(Λsq' * part)
-
-    ∇Q = 4 * Λ .* part - 4 * (ΛxΛ .* (Λsq * Λsq')) * Λ
-    return Q, ∇Q
+    if !isnothing(∇Q)
+        ∇Q .= Λ .* part
+        mul!(∇Q, ΛxΛ .* (Λsq * Λsq'), Λ, -4, 4)
+    end
+    return tr(Λsq' * part)
 end
 
 """

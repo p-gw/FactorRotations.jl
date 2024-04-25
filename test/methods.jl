@@ -1,27 +1,28 @@
 function test_criterion_and_gradient(method, Λ)
-    Q, ∇Q = criterion_and_gradient(method, Λ)
-
+    ∇Q = fill!(similar(Λ), NaN)
+    Q = @inferred(criterion_and_gradient!(∇Q, method, Λ))
     @test Q isa Real
-    @test ∇Q isa AbstractMatrix{<:Real}
-    @test size(∇Q) == size(Λ)
+    @test all(isfinite, ∇Q)
 
-    # test the criterion() method if available
-    if applicable(criterion, method, Λ)
-        Q2 = criterion(method, Λ)
-        @test Q2 isa Real
-        @test Q ≈ Q2
-    end
+	# test criterion-only calculation
+    Q2 = @inferred(criterion_and_gradient!(nothing, method, Λ))
+    @test Q2 == Q
+
+    # test criterion() wrapper
+    Q3 = @inferred(criterion(method, Λ))
+    @test Q3 isa Real
+    @test Q3 == Q
 
     return nothing
 end
 
 function test_rotate(method, Λ; init)
-    rot = rotate(Λ, method; init)
+    rot = @inferred(rotate(Λ, method; init))
     p, k = size(Λ)
 
-    @test size(loadings(rot)) == (p, k)
-    @test size(rotation(rot)) == (k, k)
-    @test size(factor_correlation(rot)) == (k, k)
+    @test size(@inferred(loadings(rot))) == (p, k)
+    @test size(@inferred(rotation(rot))) == (k, k)
+    @test size(@inferred(factor_correlation(rot))) == (k, k)
     @test loadings(rot) * rotation(rot)' ≈ Λ
 
     if isorthogonal(method)
@@ -33,9 +34,9 @@ function test_equivalence(Λ, m1::RotationMethod, m2::RotationMethod; kwargs...)
     r1 = rotate(Λ, m1; kwargs...)
     r2 = rotate(Λ, m2; kwargs...)
 
-    @test isapprox(loadings(r1), loadings(r2), atol = 1e-5)
-    @test isapprox(rotation(r1), rotation(r2), atol = 1e-5)
-    @test isapprox(factor_correlation(r1), factor_correlation(r2), atol = 1e-5)
+    @test loadings(r1) ≈ loadings(r2) atol = 1e-5
+    @test rotation(r1) ≈ rotation(r2) atol = 1e-5
+    @test factor_correlation(r1) ≈ factor_correlation(r2) atol = 1e-5
 end
 
 @testset "factor rotation methods" begin
@@ -108,7 +109,7 @@ end
         @test_throws ArgumentError Concave(0)
         @test_throws ArgumentError Concave(-2)
 
-        method = Absolmin(0)
+        method = Absolmin(1e-5)
         @test isoblique(method)
         test_criterion_and_gradient(method, A)
         @test_throws ArgumentError Absolmin(-1.0)
@@ -252,7 +253,7 @@ end
     end
 
     @testset "TargetRotation" begin
-        @test_throws ArgumentError criterion_and_gradient(TargetRotation([0 1; 1 0]), A)
+        @test_throws ArgumentError criterion_and_gradient!(similar(A), TargetRotation([0 1; 1 0]), A)
 
         # orthogonal + complete case
         method = TargetRotation(similar(A), orthogonal = true)
@@ -284,23 +285,36 @@ end
         # Quartimax is a special case of Oblimin
         test_equivalence(A, Quartimax(), Oblimin(gamma = 0, orthogonal = true); init)
 
-        # test that rotation result is identical published results by
-        # Bernaards & Jennrich (2005) within the reported accuracy of 7 digits
-        Ar = rotate(A, Quartimax(); init, g_atol = 1e-5)
-        Ar = round.(loadings(Ar), digits = 7)
+        # test that rotation result is identical to GPArotation
+        Ar = rotate(A, Quartimax(); init, g_atol = 1e-7)
 
-        pub = [
-            0.8987554 0.1948197
-            0.9339440 0.1297446
-            0.9021319 0.1038604
-            0.8765090 0.1712805
-            0.3155758 0.8764747
-            0.2511265 0.7734879
-            0.1980102 0.7146775
-            0.3078601 0.6593331
+        # loadings published in Bernaards & Jennrich (2005)
+        # within the reported accuracy of 7 digits
+        #pub = [
+        #    0.8987554 0.1948197
+        #    0.9339440 0.1297446
+        #    0.9021319 0.1038604
+        #    0.8765090 0.1712805
+        #    0.3155758 0.8764747
+        #    0.2511265 0.7734879
+        #    0.1980102 0.7146775
+        #    0.3078601 0.6593331
+        #]
+        # loadings obtained with GPArotation v2024.3
+        # quartimax(A, eps=1e-8, maxit=50000, randomStarts=10)
+        gpa = [
+            0.8987545678868889   0.19482357840480186
+            0.9339434064715286   0.1297486551312077
+            0.9021314838553653   0.10386426641014213
+            0.8765082522883497   0.1712842189765975
+            0.31557202157519415  0.87647606881132
+            0.2511231928032839   0.7734889411208703
+            0.19800711751346906  0.7146783762042948
+            0.3078572424280441   0.6593344510069232
         ]
 
-        @test Ar ≈ pub
+        @test FactorRotations.loadings(Ar) ≈ gpa atol=1e-6
+        @test criterion(Quartimax(), Ar.L) ≈ criterion(Quartimax(), gpa) atol = 1e-8
     end
 
     @testset "Simplimax" begin
@@ -328,5 +342,13 @@ end
             CrawfordFerguson(kappa = 1 / p, orthogonal = true);
             init,
         )
+    end
+
+    @testset "Missing criterion implementation" begin
+        struct NoCriterion <: RotationMethod{Orthogonal} end
+
+        @test_throws "NoCriterion does not implement" criterion(NoCriterion(), randn(6, 6))
+        # Enzyme.jl would refuse to autodiff because it detects that fallback criterion() throws an error
+        @test_throws "Function to differentiate" criterion_and_gradient!(randn(6, 5), NoCriterion(), randn(6, 5))
     end
 end

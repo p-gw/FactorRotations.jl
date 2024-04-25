@@ -3,11 +3,8 @@
 
 An abstract type representing a factor rotation method.
 
-Each implementation of `M <: RotationMethod` must implement at least one of the following methods:
-- [`criterion`](@ref)
-- [`criterion_and_gradient`](@ref)
-
-If only [`criterion`](@ref) is implemented, gradients are calculated by automatic differentiation.
+Each implementation of `M <: RotationMethod` must provide [`criterion_and_gradient!`](@ref)
+method.
 """
 abstract type RotationMethod{T<:RotationType} end
 
@@ -15,22 +12,34 @@ abstract type RotationMethod{T<:RotationType} end
     criterion(method::RotationMethod, Λ::Abstractmatrix{<:Real})
 
 Calculate the criterion of a given `method` with respect to the factor loading matrix `Λ`.
+
+The method is just a wrapper for a [`criterion_and_gradient!(nothing, method, Λ)`](@ref criterion_and_gradient!) call.
 """
-function criterion end
+criterion(method::RotationMethod, Λ::AbstractMatrix{<:Real}) = criterion_and_gradient!(nothing, method, Λ)
 
 """
-    criterion_and_gradient(method::RotationMethod, Λ::AbstractMatrix{<:Real})
+    criterion_and_gradient!(∇Q::Union{AbstractMatrix{<:Real}, Nothing},
+                            method::RotationMethod, Λ::AbstractMatrix{<:Real})
 
-Calculate the criterion and gradient of a given `method` with respect to the factor loading
-matrix `Λ`.
+Calculate the quality criterion *Q* and its gradient for a given `method`
+with respect to the factor loading matrix `Λ`.
+The gradient is output into `∇Q` matrix, which should have the same dimensions as `Λ`.
+The `∇Q` calculation is skipped if `∇Q ≡ nothing`.
 
-Returns a Tuple with the criterion value as the first element and gradient as the second
-element.
+Returns the *Q* criterion value.
 """
-function criterion_and_gradient(method::RotationMethod, Λ::AbstractMatrix)
-    Q = criterion(method, Λ)
-    ∇Q = gradient(Reverse, Base.Fix1(criterion, method), Λ)
-    return Q, ∇Q
+criterion_and_gradient!
+
+OptionalGradient = Union{AbstractMatrix, Nothing}
+
+# fallback method that applies auto-diff to criterion() call
+function criterion_and_gradient!(∇Q::OptionalGradient, method::RotationMethod, Λ::AbstractMatrix)
+    if !isnothing(∇Q)
+        gradient!(Reverse, ∇Q, Base.Fix1(criterion, method), Λ)
+    else
+        error("$(typeof(method)) does not implement neither criterion_and_gradient!(∇Q, ...) nor criterion_and_gradient!(nothing, ...) methods.")
+    end
+    return criterion(method, Λ)
 end
 
 """

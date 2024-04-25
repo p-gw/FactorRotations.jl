@@ -37,19 +37,21 @@ struct CrawfordFerguson{T,V} <: RotationMethod{T}
     end
 end
 
-function criterion_and_gradient(method::CrawfordFerguson, Λ::AbstractMatrix{T}) where {T}
+function criterion_and_gradient!(∇Q::OptionalGradient, method::CrawfordFerguson, Λ::AbstractMatrix{T}) where {T}
     @unpack κ = method
     p, k = size(Λ)
 
-    N = ones(T, k, k) |> zerodiag!
-    M = ones(T, p, p) |> zerodiag!
+    N = Ones(k, k) - I(k)
+    M = Ones(p, p) - I(p)
 
     Λsq = Λ .^ 2
 
     ΛsqN = Λsq * N
     MΛsq = M * Λsq
 
-    Q = (1 - κ) * tr(Λsq' * ΛsqN) / 4 + κ * tr(Λsq' * MΛsq) / 4
-    ∇Q = (1 - κ) * Λ .* ΛsqN + κ * Λ .* MΛsq
-    return Q, ∇Q
+    Q = ((1 - κ)/4) * tr(Λsq' * ΛsqN) + (κ/4) * tr(Λsq' * MΛsq)
+    if !isnothing(∇Q)
+        @. ∇Q = (1 - κ) * Λ * ΛsqN + κ * Λ * MΛsq
+    end
+    return Q
 end

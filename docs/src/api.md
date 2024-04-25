@@ -59,6 +59,6 @@ Oblique
 Orthogonal
 RotationMethod
 criterion
-criterion_and_gradient
+criterion_and_gradient!
 ConvergenceError
 ```
