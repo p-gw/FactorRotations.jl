@@ -24,8 +24,7 @@ function criterion_and_gradient!(∇Q::OptionalGradient, method::Geomin, Λ::Abs
     Q = sum(part)
     if !isnothing(∇Q)
         # ∇Q === Λsq
-        part .*= (2 / k)
-        ∇Q .= Λ ./ Λsq .* part
+        ∇Q .= (2 / k) .* Λ ./ Λsq .* part
     end
 
     return Q
