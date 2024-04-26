@@ -1,4 +1,4 @@
-name: Benchmark a pull request
+name: PkgBenchmark
 
 on:
   pull_request_target:
