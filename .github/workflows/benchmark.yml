@@ -9,7 +9,7 @@ on:
 permissions:
   pull-requests: write
 jobs:
-  generate_plots:
+  benchmark:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
