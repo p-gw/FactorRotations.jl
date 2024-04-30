@@ -13,6 +13,7 @@ Biquartimin
 ComponentLoss
 Concave
 CrawfordFerguson
+Equamax
 Geomin
 Infomax
 KatzRohlf
@@ -21,6 +22,7 @@ MinimumEntropy
 MinimumEntropyRatio
 Oblimax
 Oblimin
+Parsimax
 PatternSimplicity
 Quartimax
 Simplimax

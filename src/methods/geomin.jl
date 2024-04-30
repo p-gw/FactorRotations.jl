@@ -16,16 +16,15 @@ end
 
 function criterion_and_gradient!(∇Q::OptionalGradient, method::Geomin, Λ::AbstractMatrix{T}) where {T}
     @unpack ε = method
-    Λsq = Λ .^ 2 .+ ε
-    p, k = size(Λ)
-    u = Ones(T, p)
-    v = Ones(T, k)
+    Λsq = !isnothing(∇Q) ? ∇Q : similar(Λ)
+    Λsq .= Λ .^ 2 .+ ε
+    k = size(Λ, 2)
 
-    part = exp.((log.(Λsq) * v) ./ k)
-    Q = u' * part
+    part = exp.(sum(log.(Λsq), dims=2) ./ k)
+    Q = sum(part)
     if !isnothing(∇Q)
-        mul!(∇Q, part, v')
-        ∇Q .*= (2 / k) .* inv.(Λsq) .* Λ
+        # ∇Q === Λsq
+        ∇Q .= (2 / k) .* Λ ./ Λsq .* part
     end
 
     return Q

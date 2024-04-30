@@ -7,10 +7,13 @@ struct MinimumEntropy <: RotationMethod{Orthogonal} end
 
 function criterion_and_gradient!(∇Q::OptionalGradient, ::MinimumEntropy, Λ::AbstractMatrix)
     Λsq = Λ .^ 2
-    logΛsq = log.(Λsq)
-    Q = -tr(Λsq' * logΛsq) / 2
+    mlogΛsq = !isnothing(∇Q) ? ∇Q : similar(Λ)
+    @. mlogΛsq = -log(Λsq)
+    Q = dot(Λsq, mlogΛsq) / 2
     if !isnothing(∇Q)
-        @. ∇Q = (-1 - logΛsq) * Λ
+        # ∇Q === mlogΛsq
+        ∇Q .-= one(eltype(∇Q))
+        ∇Q .*= Λ
     end
     return Q
 end

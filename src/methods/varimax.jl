@@ -1,10 +1,11 @@
 """
     Varimax()
 
-The Varimax rotation criterion.
+The *Varimax* rotation criterion.
 
 ## Details
-The Varimax criterion is a special case of the Oblimin rotation criterion with parameter
+The *Varimax* is an orthogonal rotation method that maximizes the column variances of the loading matrix.
+It is a special case of the [`Oblimin`](@ref) rotation criterion with parameter
 `gamma = 1`.
 
 ## Examples

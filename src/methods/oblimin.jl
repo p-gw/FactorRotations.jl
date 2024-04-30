@@ -1,27 +1,28 @@
 """
     Oblimin(; gamma, orthogonal = false)
 
-The family of Oblimin rotation methods.
+The family of *Oblimin* rotation methods.
 
 ## Keyword arguments
-- `gamma`: The shape parameter determining the rotation criterion (see Details).
+- `gamma`: The shape parameter determining the rotation criterion (see *Details*).
 - `orthogonal`: If `orthogonal = true` an orthogonal rotation is performed, an oblique
    rotation otherwise. (default: `false`)
 
 ## Details
-The Oblimin rotation family allow orthogonal as well as oblique rotation of the factor
-loading matrix. If orthogonal rotation is performed, Oblimin is equivalent to the following
+The *Oblimin* rotation family allows orthogonal as well as oblique rotation of the *p*×*k* factor
+loading matrix. If orthogonal rotation is performed, *Oblimin* is equivalent to the following
 rotation methods given a value for `gamma`:
+- *γ = p×κ*: [`CrawfordFerguson(kappa = κ, orthogonal = true)`](@ref CrawfordFerguson)
+- *γ = 0*: [`Quartimax`](@ref)
+- *γ = 1/2*: [`Biquartimax`](@ref)
+- *γ = 1*: [`Varimax`](@ref)
+- *γ = k/2*: [`Equamax`](@ref)
+- *γ = p×(k - 1)/(p + k - 2)*: [`Parsimax`](@ref)
 
-- `gamma = 0` → [`Quartimax`](@ref)
-- `gamma = 0.5` → [`Biquartimax`](@ref)
-- `gamma = 1` → [`Varimax`](@ref)
-- `gamma = p/2` → Equamax
+For oblique rotation *Oblimin* is equivalent to the following rotation methods:
 
-For oblique rotation Oblimin is equivalent to the following rotation methods:
-
-- `gamma = 0` → Quartimin
-- `gamma = 0.5` → Biquartimin
+- *γ = 0*: *Quartimin*
+- *γ = 1/2*: [`Biquartimin`](@ref)
 
 ## Examples
 ```jldoctest
@@ -40,20 +41,5 @@ struct Oblimin{T,V} <: RotationMethod{T}
     end
 end
 
-function criterion_and_gradient!(∇Q::OptionalGradient, method::Oblimin, Λ::AbstractMatrix{T}) where {T}
-    @unpack γ = method
-    p, k = size(Λ)
-    C = Fill(1 / p, p, p)
-    N = ones(T, k, k)
-    zerodiag!(N)
-
-    Λsq = Λ .^ 2
-
-    part = (I - γ * C) * Λsq * N
-
-    Q = tr(Λsq' * part) / 4
-    if !isnothing(∇Q)
-        ∇Q .= Λ .* part
-    end
-    return Q
-end
+criterion_and_gradient!(∇Q::OptionalGradient, method::Oblimin, Λ::AbstractMatrix{<:Real}) =
+    weighted_sums_criterion_and_gradient!(∇Q, Λ, 1 - method.γ, method.γ / size(Λ, 1))

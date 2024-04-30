@@ -16,7 +16,7 @@ To install FactorRotations.jl you can use the Julia package manager,
 ```
 
 ## Getting started
-FactorRotations.jl provides methods to rotate factor loading matrices, e.g. from 
+*FactorRotations.jl* provides methods to rotate factor loading matrices, e.g. from
 exploratory factor analysis or principle component analysis.
 
 Assume you aquired a factor loading matrix `L` then you can rotate the matrix by calling
@@ -38,9 +38,9 @@ L = [
 rotate(L, Varimax())
 ```
 
-For a complete list of available methods see the [Rotation Methods](https://github.com/p-gw/FactorRotations.jl/rotation_methods.jl) section of the documentation.
+For a complete list of available methods see the [Rotation Methods](@ref rotation_methods) section of the documentation.
 
-For a fully worked example see the [Guides](https://github.com/p-gw/FactorRotations.jl/guides/index.html) section of the documentation.
+For a fully worked example see the [Guides](@ref guides) section of the documentation.
 
 # References
 Bernaards, C. A., & Jennrich, R. I. (2005). Gradient projection algorithms and software for arbitrary rotation criteria in factor analysis. *Educational and psychological measurement, 65*(5), 676-696.

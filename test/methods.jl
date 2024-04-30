@@ -152,14 +152,28 @@ end
             Oblimin(gamma = 1, orthogonal = true);
             init,
         )
+        test_equivalence(A,
+            Equamax(),
+            CrawfordFerguson(kappa = k/(2p), orthogonal = true);
+            init
+        )
+        test_equivalence(A,
+            Parsimax(),
+            CrawfordFerguson(kappa = (k - 1)/(p + k - 2), orthogonal = true);
+            init
+        )
 
-        # TODO: Equamax: kappa = k/2p
-        # TODO: Parsimax: kappa = (k - 1)/(p + k - 2)
         # TODO: Factor Parsimony: kappa = 1
 
         # oblique case
         method = CrawfordFerguson(kappa = 0.5, orthogonal = false)
         @test isoblique(method)
+        test_criterion_and_gradient(method, A)
+    end
+
+    @testset "Equamax" begin
+        method = Equamax()
+        @test isorthogonal(method)
         test_criterion_and_gradient(method, A)
     end
 
@@ -211,6 +225,8 @@ end
     end
 
     @testset "Oblimin" begin
+        p, k = size(A)
+
         # orthogonal case
         method = Oblimin(gamma = 0.5, orthogonal = true)
         @test isorthogonal(method)
@@ -219,6 +235,23 @@ end
         # oblique case
         method = Oblimin(gamma = 0.0, orthogonal = false)
         @test isoblique(method)
+        test_criterion_and_gradient(method, A)
+
+        test_equivalence(A,
+            Equamax(),
+            Oblimin(gamma = k / 2, orthogonal = true);
+            init
+        )
+        test_equivalence(A,
+            Parsimax(),
+            Oblimin(gamma = p * (k - 1) / (p + k - 2), orthogonal = true);
+            init
+        )
+    end
+
+    @testset "Parsimax" begin
+        method = Parsimax()
+        @test isorthogonal(method)
         test_criterion_and_gradient(method, A)
     end
 
