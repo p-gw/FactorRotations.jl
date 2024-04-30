@@ -1,4 +1,4 @@
-# Rotation Criteria
+# [Rotation Methods](@id rotation_methods)
 
 FactorRotations.jl implements both orthogonal and oblique rotation criteria. The following tables list the available methods and their respective references.
 
