@@ -16,13 +16,15 @@ so that the rotated loadings matrix *Λ = L × U* optimizes the given *criterion
 | [`Biquartimin`](@ref)         | [jennrich2011](@citet)               |
 | [`ComponentLoss`](@ref)       | [jennrich2004, jennrich2006](@citet) |
 | [`CrawfordFerguson`](@ref)    | [crawford1970](@citet)               |
+| [`Equamax`](@ref)             | [crawford1970](@citet)               | equivalent to `Oblimin(gamma = k/2, orthogonal = true)` |
 | [`Infomax`](@ref)             | [browne2001](@citet)                 | based on the unpublished manuscript McKeon (1968)       |
 | [`KatzRohlf`](@ref)           |                                      |
 | [`LinearRightConstant`](@ref) | [jennrich2004](@citet)               |
 | [`MinimumEntropyRatio`](@ref) | [mccammon1966](@citet)               |
 | [`MinimumEntropy`](@ref)      | [jennrich2004](@citet)               |
 | [`Oblimax`](@ref)             |                                      |
-| [`Oblimin`](@ref)             |                                      | equivalent to `Oblimin` for orthogonal rotation         |
+| [`Oblimin`](@ref)             |                                      |
+| [`Parsimax`](@ref)            | [crawford1970](@citet)               | equivalent to `Oblimin(gamma = p*(k-1)/(p+k-2), orthogonal = true)`|
 | [`PatternSimplicity`](@ref)   | [bentler1977](@citet)                |
 | [`Quartimax`](@ref)           | [neuhaus1954](@citet)                | equivalent to `Oblimin(gamma = 0, orthogonal = true)`   |
 | [`TandemCriteria`](@ref)      | [comrey1967](@citet)                 |
