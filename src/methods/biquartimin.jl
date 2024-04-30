@@ -15,20 +15,17 @@ struct Biquartimin{RT} <: RotationMethod{RT}
 end
 
 function criterion_and_gradient!(∇Q::OptionalGradient, ::Biquartimin, Λ::AbstractMatrix)
-    p, k = size(Λ)
-    n = k - 1
-
     Λ₂ = @view Λ[:, 2:end]
     Λ₂sq = Λ₂ .^ 2
-    N = Ones(n, n) - I(n)
+    part = !isnothing(∇Q) ? @view(∇Q[:, 2:end]) : similar(Λ₂sq)
+    part .= sum(Λ₂sq, dims = 2) .- Λ₂sq
 
-    Q = sum(Λ₂sq .* (Λ₂sq * N))
+    Q = sum(Λ₂sq .* part)
 
     if !isnothing(∇Q)
+        # ∇Q[:, 2:end] === part
         ∇Q[:, 1] .= zero(eltype(∇Q))
-        ∇Q₂ = @view ∇Q[:, 2:end]
-        ∇Q₂ .= Λ₂ .* (Λ₂sq * N)
-        lmul!(4, ∇Q)
+        @. part *= 4 * Λ₂
     end
     return Q
 end
