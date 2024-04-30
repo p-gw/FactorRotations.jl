@@ -15,7 +15,7 @@ struct Infomax{T} <: RotationMethod{T}
 end
 
 function criterion_and_gradient!(∇Q::OptionalGradient, ::Infomax, Λ::AbstractMatrix{T}) where {T}
-    p, k = size(Λ)
+    k = size(Λ, 2)
     Λsq = Λ .^ 2
 
     total = sum(Λsq)
@@ -27,21 +27,15 @@ function criterion_and_gradient!(∇Q::OptionalGradient, ::Infomax, Λ::Abstract
         sum(mxlogx, colsums)
     isnothing(∇Q) && return Q
 
-    u = Ones(T, p)
-    v = Ones(T, k)
-
     H = @. -(log(Λsq) + 1)
-    α = u' * (Λsq .* H) * v / total
-    G₀ = H / total - α * u * v'
+    G₀ = @. (H - dot(Λsq, H))
 
-    h₁ = -(log.(Λsq * v) .+ 1)
-    α₁ = v' * Λsq' * h₁ / total
-    G₁ = h₁ * v' / total - α₁ * u * v'
+    h₁ = @. -(log(rowsums) + 1)
+    G₁ = @. (h₁ - dot(rowsums, h₁))
 
-    h₂ = -(log.(u' * Λsq) .+ 1)
-    α₂ = h₂ * Λsq' * u / total
-    G₂ = u * h₂ / total - α₂ .* u * v'
+    h₂ = @. -(log(colsums) + 1)
+    G₂ = @. (h₂ - dot(h₂, colsums))
 
-    @. ∇Q = 2Λ * (G₀ - G₁ - G₂)
+    @. ∇Q = (2/total) * Λ * (G₀ - G₁ - G₂)
     return Q
 end
