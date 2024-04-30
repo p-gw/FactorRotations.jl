@@ -225,6 +225,8 @@ end
     end
 
     @testset "Oblimin" begin
+        p, k = size(A)
+
         # orthogonal case
         method = Oblimin(gamma = 0.5, orthogonal = true)
         @test isorthogonal(method)
@@ -234,6 +236,17 @@ end
         method = Oblimin(gamma = 0.0, orthogonal = false)
         @test isoblique(method)
         test_criterion_and_gradient(method, A)
+
+        test_equivalence(A,
+            Equamax(),
+            Oblimin(gamma = k / 2, orthogonal = true);
+            init
+        )
+        test_equivalence(A,
+            Parsimax(),
+            Oblimin(gamma = p * (k - 1) / (p + k - 2), orthogonal = true);
+            init
+        )
     end
 
     @testset "Parsimax" begin
