@@ -9,10 +9,10 @@ The family of *Oblimin* rotation methods.
    rotation otherwise. (default: `false`)
 
 ## Details
-The *Oblimin* rotation family allows orthogonal as well as oblique rotation of the factor
+The *Oblimin* rotation family allows orthogonal as well as oblique rotation of the *p*×*k* factor
 loading matrix. If orthogonal rotation is performed, *Oblimin* is equivalent to the following
 rotation methods given a value for `gamma`:
-
+- *γ = p\\*κ*: [`CrawfordFerguson(kappa = κ, orthogonal = true)`](@ref CrawfordFerguson)
 - *γ = 0*: [`Quartimax`](@ref)
 - *γ = 1/2*: [`Biquartimax`](@ref)
 - *γ = 1*: [`Varimax`](@ref)
