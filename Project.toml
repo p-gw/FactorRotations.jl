@@ -1,7 +1,7 @@
 name = "FactorRotations"
 uuid = "be5e9834-f3d9-4b7e-b5ea-d062861d4ac2"
 authors = ["Philipp Gewessler"]
-version = "0.3.1"
+version = "0.4.0"
 
 [deps]
 Enzyme = "7da242da-08ed-463a-9acd-ee780be4f1d9"
