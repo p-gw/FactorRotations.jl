@@ -22,6 +22,7 @@ MultivariateStatsExt = "MultivariateStats"
 [compat]
 Enzyme = "0.11, 0.12"
 FillArrays = "1"
+Folds = "0.2"
 LogExpFunctions = "0.3"
 MultivariateStats = "0.10"
 SimpleUnPack = "1"
