@@ -75,6 +75,7 @@ Perform a rotation of the factor loading matrix `Λ` using a rotation `method`.
                   starting matrices.
 - `reflect`: Switch signs of the columns of the rotated loading matrix such that the sum of
              loadings is non-negative for all columns (default: true)
+- `use_threads`: Parallelize random starts using threads (default: false)
 - `verbose`: Print logging statements (default: true)
 - `logperiod`: How frequently to report the optimization state (default: 100).
 
@@ -109,6 +110,7 @@ function rotate(
     reflect = true,
     f_atol = 1e-6,
     g_atol = 1e-6,
+    use_threads = false,
     kwargs...,
 )
     loglevel = verbose ? Logging.Info : Logging.Debug
@@ -130,42 +132,22 @@ function rotate(
             @warn "Requested random starts but keyword argument `init` was provided. Ignoring initial starting values in `init`."
         end
 
-        Q_min = Inf
-        rotation = initialize(rotation_type(method), nothing, L; loglevel = Logging.Debug)
-        n_diverged = 0
-        n_at_Q_min = 0
-
-        for _ in 1:starts
+        f = use_threads ? Folds.map : map
+        states = f(1:starts) do _
             init = random_orthogonal_matrix(size(L, 2))
-            random_rotation = try
-                _rotate(L, method; g_atol, loglevel, kwargs..., init)
-            catch err
-                if err isa ConvergenceError
-                    @logmsg loglevel err.msg
-                    n_diverged += 1
-                    continue
-                else
-                    rethrow()
-                end
-            end
-
-            Q_current = minimumQ(random_rotation)
-
-            if isapprox(Q_current, Q_min, atol = f_atol)
-                n_at_Q_min += 1
-            elseif Q_current < Q_min
-                @logmsg loglevel "Found new minimum at Q = $(Q_current)"
-                n_at_Q_min = 1
-                Q_min = Q_current
-                rotation = random_rotation
-            end
+            return _rotate(L, method; g_atol, loglevel, kwargs..., init)
         end
+
+        rotation = argmin(minimumQ, states)
+        Q_mins = minimumQ.(states)
+        Q_min = minimumQ(rotation)
+        n_at_Q_min = sum(isapprox(Q, Q_min) for Q in Q_mins)
+        n_diverged = sum(is_diverged(s) for s in states)
 
         @logmsg loglevel "Finished $(starts) rotations with random starts."
 
         if n_diverged == starts
-            msg = "All $(starts) rotations did not converge. Please check the provided rotation method and/or loading matrix."
-            throw(ConvergenceError(msg))
+            @warn "All $(starts) rotations did not converge. Please check the provided rotation method and/or loading matrix."
         elseif n_diverged > 0
             @warn "There were $(n_diverged) rotations that did not converge. Please check the provided rotation method and/or loading matrix."
         else
@@ -266,9 +248,10 @@ mutable struct RotationState{RT<:RotationType,T<:AbstractMatrix,S<:IterationStat
     Ti::Union{Nothing,T}
     L::T
     iterations::Vector{S}
+    is_converged::Bool
 end
 
-function RotationState(::Type{T}, init, A) where T <: RotationType
+function RotationState(::Type{T}, init, A) where {T<:RotationType}
     if T <: Orthogonal
         Ti = nothing
         L = A * init
@@ -279,8 +262,11 @@ function RotationState(::Type{T}, init, A) where T <: RotationType
         throw(ArgumentError("Unsupported rotation type $(T)"))
     end
     S = IterationState{eltype(A),eltype(A)}
-    return RotationState{T,typeof(A),S}(init, A, init, Ti, L, S[])
+    return RotationState{T,typeof(A),S}(init, A, init, Ti, L, S[], false)
 end
+
+is_converged(state::RotationState) = state.is_converged
+is_diverged(state::RotationState) = !is_converged(state)
 
 function minimumQ(state::RotationState)
     return length(state.iterations) > 0 ? last(state.iterations).Q : NaN
@@ -325,7 +311,7 @@ function _rotate(
         project_G!(Gp, state, G)
         s = norm(Gp)
 
-        isconverged(s, g_atol) && break
+        is_converged(s, g_atol) && break
 
         α *= 2
 
@@ -348,20 +334,22 @@ function _rotate(
             end
         end
 
-        (i == 1 || i == maxiter1 || mod(i, logperiod) == 0) &&
-            @logmsg loglevel "Current optimization state:" iteration = i criterion = Q alpha = α
+        if (i == 1 || i == maxiter1 || mod(i, logperiod) == 0)
+            @logmsg loglevel "Current optimization state:" iteration = i criterion = Q alpha =
+                α
+        end
 
         iteration_state = IterationState(α, maxiter2, Q)
         push!(state.iterations, iteration_state)
     end
 
-    if !isconverged(s, g_atol)
-        msg = "Algorithm did not converge after $(maxiter1) iterations (|∇G|=$(s) > $(g_atol))"
-        throw(ConvergenceError(msg))
+    if !is_converged(s, g_atol)
+        @warn "Algorithm did not converge after $(maxiter1) iterations (|∇G|=$(s) > $(g_atol))"
+    else
+        state.is_converged = true
+        @logmsg loglevel "Rotation algorithm converged after $(length(state.iterations)) iterations."
+        @logmsg loglevel "Final criterion value = $(ft)"
     end
-
-    @logmsg loglevel "Rotation algorithm converged after $(length(state.iterations)) iterations."
-    @logmsg loglevel "Final criterion value = $(ft)"
 
     return state
 end
@@ -456,8 +444,8 @@ function update_state!(state::RotationState{Oblique}, Tt)
 end
 
 """
-    isconverged(s, g_atol)
+    is_converged(s, g_atol)
 
 determines the convergence status of the algorithm.
 """
-isconverged(s, g_atol) = s < g_atol
+is_converged(s, g_atol) = s < g_atol

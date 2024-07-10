@@ -49,14 +49,3 @@ function centercols!(m::AbstractMatrix)
     end
     return m
 end
-
-"""
-    ConvergenceError
-
-The algorithm did not converge. `msg` provides a descriptive error message.
-"""
-struct ConvergenceError <: Exception
-    msg::String
-end
-
-Base.show(io::IO, err::ConvergenceError) = print(io, "ConvergenceError: $(err.msg)")
