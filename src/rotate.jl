@@ -142,7 +142,7 @@ function rotate(
         Q_mins = minimumQ.(states)
         Q_min = minimumQ(rotation)
         n_at_Q_min = sum(isapprox(Q, Q_min) for Q in Q_mins)
-        n_diverged = sum(1 - is_converged(s) for s in states)
+        n_diverged = sum(is_diverged(s) for s in states)
 
         @logmsg loglevel "Finished $(starts) rotations with random starts."
 
@@ -266,6 +266,7 @@ function RotationState(::Type{T}, init, A) where {T<:RotationType}
 end
 
 is_converged(state::RotationState) = state.is_converged
+is_diverged(state::RotationState) = !is_converged(state)
 
 function minimumQ(state::RotationState)
     return length(state.iterations) > 0 ? last(state.iterations).Q : NaN
