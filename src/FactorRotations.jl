@@ -16,7 +16,6 @@ export setverbosity!
 export FactorRotation, loadings, rotation, factor_correlation
 export rotate, rotate!
 export criterion, criterion_and_gradient!
-export ConvergenceError
 
 export reflect, reflect!
 

@@ -62,5 +62,4 @@ Orthogonal
 RotationMethod
 criterion
 criterion_and_gradient!
-ConvergenceError
 ```

@@ -75,6 +75,7 @@ Perform a rotation of the factor loading matrix `Λ` using a rotation `method`.
                   starting matrices.
 - `reflect`: Switch signs of the columns of the rotated loading matrix such that the sum of
              loadings is non-negative for all columns (default: true)
+- `use_threads`: Parallelize random starts using threads (default: false)
 - `verbose`: Print logging statements (default: true)
 - `logperiod`: How frequently to report the optimization state (default: 100).
 
@@ -109,7 +110,7 @@ function rotate(
     reflect = true,
     f_atol = 1e-6,
     g_atol = 1e-6,
-    use_threads = true,
+    use_threads = false,
     kwargs...,
 )
     loglevel = verbose ? Logging.Info : Logging.Debug
@@ -146,8 +147,7 @@ function rotate(
         @logmsg loglevel "Finished $(starts) rotations with random starts."
 
         if n_diverged == starts
-            msg = "All $(starts) rotations did not converge. Please check the provided rotation method and/or loading matrix."
-            throw(ConvergenceError(msg))
+            @warn "All $(starts) rotations did not converge. Please check the provided rotation method and/or loading matrix."
         elseif n_diverged > 0
             @warn "There were $(n_diverged) rotations that did not converge. Please check the provided rotation method and/or loading matrix."
         else

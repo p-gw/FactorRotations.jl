@@ -3,11 +3,12 @@
     @test_throws ArgumentError rotate(A, Varimax(), init = rand(10, 10))
     @test_throws ArgumentError rotate(A, Varimax(), init = rand(8, 2))
 
-    rot_default_init = rotate(A, Varimax(), g_atol=1e-7)
-    rot_identity_init = rotate(A, Varimax(); g_atol=1e-7, init)
-    @test loadings(rot_default_init) ≈ loadings(rot_identity_init) atol=1e-7
-    @test rotation(rot_default_init) ≈ rotation(rot_identity_init) atol=1e-7
-    @test factor_correlation(rot_default_init) ≈ factor_correlation(rot_identity_init) atol=1e-7
+    rot_default_init = rotate(A, Varimax(), g_atol = 1e-7)
+    rot_identity_init = rotate(A, Varimax(); g_atol = 1e-7, init)
+    @test loadings(rot_default_init) ≈ loadings(rot_identity_init) atol = 1e-7
+    @test rotation(rot_default_init) ≈ rotation(rot_identity_init) atol = 1e-7
+    @test factor_correlation(rot_default_init) ≈ factor_correlation(rot_identity_init) atol =
+        1e-7
 
     # in-place rotation
     B = copy(A)
@@ -27,13 +28,17 @@
     # convergence
     struct NonConverging <: RotationMethod{Orthogonal} end
 
-    function FactorRotations.criterion_and_gradient!(∇Q::Union{Nothing, AbstractMatrix}, ::NonConverging, m::AbstractMatrix)
+    function FactorRotations.criterion_and_gradient!(
+        ∇Q::Union{Nothing,AbstractMatrix},
+        ::NonConverging,
+        m::AbstractMatrix,
+    )
         isnothing(∇Q) || fill!(∇Q, one(eltype(∇Q)))
         return 1.0
     end
 
-    @test_throws ConvergenceError rotate(A, NonConverging())
-    @test_throws ConvergenceError rotate(A, NonConverging(), randomstarts = 3)
+    @test_warn "did not converge" rotate(A, NonConverging())
+    @test_warn "did not converge" rotate(A, NonConverging(), randomstarts = 3)
 
     @test_warn "did not converge" rotate(
         ones(8, 2),
@@ -74,7 +79,11 @@
         @test isnan(FactorRotations.minimumQ(oblique_state))
 
         struct BadRotation <: FactorRotations.RotationType end
-        @test_throws "Unsupported rotation type BadRotation" FactorRotations.RotationState(BadRotation, init, A)
+        @test_throws "Unsupported rotation type BadRotation" FactorRotations.RotationState(
+            BadRotation,
+            init,
+            A,
+        )
     end
 
     @testset "gradient_f!" begin
@@ -87,7 +96,8 @@
         oblique_state = FactorRotations.RotationState(Oblique, init, A)
         fill!(g, NaN)
         @test g === FactorRotations.gradient_f!(g, oblique_state, zeros(size(A)))
-        @test FactorRotations.gradient_f!(g, oblique_state, zeros(size(A))) == zeros(size(init))
+        @test FactorRotations.gradient_f!(g, oblique_state, zeros(size(A))) ==
+              zeros(size(init))
     end
 
     @testset "project_G!" begin

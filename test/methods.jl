@@ -152,15 +152,17 @@ end
             Oblimin(gamma = 1, orthogonal = true);
             init,
         )
-        test_equivalence(A,
+        test_equivalence(
+            A,
             Equamax(),
-            CrawfordFerguson(kappa = k/(2p), orthogonal = true);
-            init
+            CrawfordFerguson(kappa = k / (2p), orthogonal = true);
+            init,
         )
-        test_equivalence(A,
+        test_equivalence(
+            A,
             Parsimax(),
-            CrawfordFerguson(kappa = (k - 1)/(p + k - 2), orthogonal = true);
-            init
+            CrawfordFerguson(kappa = (k - 1) / (p + k - 2), orthogonal = true);
+            init,
         )
 
         # TODO: Factor Parsimony: kappa = 1
@@ -237,15 +239,12 @@ end
         @test isoblique(method)
         test_criterion_and_gradient(method, A)
 
-        test_equivalence(A,
-            Equamax(),
-            Oblimin(gamma = k / 2, orthogonal = true);
-            init
-        )
-        test_equivalence(A,
+        test_equivalence(A, Equamax(), Oblimin(gamma = k / 2, orthogonal = true); init)
+        test_equivalence(
+            A,
             Parsimax(),
             Oblimin(gamma = p * (k - 1) / (p + k - 2), orthogonal = true);
-            init
+            init,
         )
     end
 
@@ -387,7 +386,7 @@ end
 
         @test_throws "NoCriterion does not implement" criterion(NoCriterion(), randn(6, 6))
         # Enzyme.jl would refuse to autodiff because it detects that fallback criterion() throws an error
-        @test_throws "Function to differentiate" criterion_and_gradient!(
+        @test_throws "NoCriterion does not implement" criterion_and_gradient!(
             randn(6, 5),
             NoCriterion(),
             randn(6, 5),
