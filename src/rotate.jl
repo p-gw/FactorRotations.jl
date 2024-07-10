@@ -131,38 +131,6 @@ function rotate(
             @warn "Requested random starts but keyword argument `init` was provided. Ignoring initial starting values in `init`."
         end
 
-        # Q_min = Inf
-        # rotation = initialize(rotation_type(method), nothing, L; loglevel = Logging.Debug)
-        # n_diverged = 0
-        # n_at_Q_min = 0
-
-        # for _ in 1:starts
-        #     init = random_orthogonal_matrix(size(L, 2))
-        #     random_rotation = try
-        #         _rotate(L, method; g_atol, loglevel, kwargs..., init)
-        #     catch err
-        #         if err isa ConvergenceError
-        #             @logmsg loglevel err.msg
-        #             n_diverged += 1
-        #             continue
-        #         else
-        #             rethrow()
-        #         end
-        #     end
-
-        #     Q_current = minimumQ(random_rotation)
-
-        #     if isapprox(Q_current, Q_min, atol = f_atol)
-        #         n_at_Q_min += 1
-        #     elseif Q_current < Q_min
-        #         @logmsg loglevel "Found new minimum at Q = $(Q_current)"
-        #         n_at_Q_min = 1
-        #         Q_min = Q_current
-        #         rotation = random_rotation
-        #     end
-        # end
-
-        # new implementation
         f = use_threads ? Folds.map : map
         states = f(1:starts) do _
             init = random_orthogonal_matrix(size(L, 2))
