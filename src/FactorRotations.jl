@@ -1,5 +1,6 @@
 module FactorRotations
 
+using Folds
 using Enzyme
 using FillArrays
 using LinearAlgebra
