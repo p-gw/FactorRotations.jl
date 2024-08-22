@@ -39,6 +39,16 @@ function test_equivalence(Λ, m1::RotationMethod, m2::RotationMethod; kwargs...)
     @test factor_correlation(r1) ≈ factor_correlation(r2) atol = 1e-5
 end
 
+@testset "factor rotation autodiff fallback" begin
+    method = ComponentLoss(abs2, orthogonal = true)
+    ∇Q = fill!(similar(A), NaN)
+
+    FactorRotations.set_autodiff_backend(:ABC)
+    @test_throws "ABC autodiff backend is not supported" criterion_and_gradient!(∇Q, method, A)
+    FactorRotations.set_autodiff_backend(:Enzyme)
+    #@test_throws "Enzyme.jl autodiff backend is not loaded" criterion_and_gradient!(∇Q, method, A)
+end
+
 @testset "factor rotation methods" begin
     @testset "utility functions" begin
         @test isorthogonal(Varimax()) != isoblique(Varimax())

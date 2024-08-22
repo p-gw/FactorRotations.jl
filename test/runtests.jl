@@ -1,5 +1,6 @@
 using FactorRotations
 using LinearAlgebra
+using Enzyme
 using Statistics
 using Test
 

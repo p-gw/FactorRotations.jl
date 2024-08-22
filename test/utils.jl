@@ -26,6 +26,14 @@
         setverbosity!(false)  # disable logging for following tests
     end
 
+    @testset "set_autodiff_backend" begin
+        @test FactorRotations.AUTODIFF_BACKEND[] == FactorRotations.AutodiffBackend(:Enzyme)
+        FactorRotations.set_autodiff_backend(:ABC)
+        @test FactorRotations.AUTODIFF_BACKEND[] == FactorRotations.AutodiffBackend(:ABC)
+        FactorRotations.set_autodiff_backend(:Enzyme)
+        @test FactorRotations.AUTODIFF_BACKEND[] == FactorRotations.AutodiffBackend(:Enzyme)
+    end
+
     @testset "centercols!" begin
         x = [1 2; 1 2]
         @test FactorRotations.centercols!(copy(x)) ≈ x .- mean(x, dims = 1)
