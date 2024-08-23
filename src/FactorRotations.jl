@@ -56,7 +56,7 @@ If set to `false` (the default), package functions will not log `@info` statemen
 If set to `true`, package functions will provide `@info` statements.
 """
 function setverbosity!(verbose::Bool)
-    @info "Logging is $(verbose ? "enabled" : "disabled") globally."
+    @info "$(@__MODULE__) logging is $(verbose ? "enabled" : "disabled") globally."
     VERBOSITY[] = verbose
     return nothing
 end
