@@ -76,7 +76,7 @@ Automatic differentiation is used by the fallback `criterion_and_gradient!()` im
 Currently, only `:Enzyme` backend is supported.
 """
 function set_autodiff_backend(backend::Symbol)
-    @info "Autodiff backend set to $(backend)."
+    @info "$(@__MODULE__) autodiff backend set to $(backend)."
     AUTODIFF_BACKEND[] = AutodiffBackend(backend)
     return nothing
 end
