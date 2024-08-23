@@ -46,7 +46,7 @@ end
     FactorRotations.set_autodiff_backend(:ABC)
     @test_throws "ABC autodiff backend is not supported" criterion_and_gradient!(∇Q, method, A)
     FactorRotations.set_autodiff_backend(:Enzyme)
-    #@test_throws "Enzyme.jl autodiff backend is not loaded" criterion_and_gradient!(∇Q, method, A)
+    @test_throws "Enzyme.jl autodiff backend is not loaded" criterion_and_gradient!(∇Q, method, A)
 end
 
 @testset "factor rotation methods" begin
@@ -88,6 +88,8 @@ end
     end
 
     @testset "ComponentLoss" begin
+        using Enzyme # load Enzyme to enable autodiff
+
         # orthogonal case
         method = ComponentLoss(abs2, orthogonal = true)
         @test isorthogonal(method)
