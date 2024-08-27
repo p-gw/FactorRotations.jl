@@ -51,6 +51,7 @@ rotate!
 rotation
 rotation_type
 setverbosity!
+FactorRotations.set_autodiff_backend
 ```
 
 ## Internals

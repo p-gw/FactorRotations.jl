@@ -1,10 +1,9 @@
 name = "FactorRotations"
 uuid = "be5e9834-f3d9-4b7e-b5ea-d062861d4ac2"
 authors = ["Philipp Gewessler"]
-version = "0.4.0"
+version = "0.5.0"
 
 [deps]
-Enzyme = "7da242da-08ed-463a-9acd-ee780be4f1d9"
 FillArrays = "1a297f60-69ca-5386-bcde-b61e274b549b"
 Folds = "41a02a25-b8f0-4f67-bc48-60067656b558"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
@@ -14,10 +13,12 @@ SimpleUnPack = "ce78b400-467f-4804-87d8-8f486da07d0a"
 Statistics = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
 
 [weakdeps]
+Enzyme = "7da242da-08ed-463a-9acd-ee780be4f1d9"
 MultivariateStats = "6f286f6a-111f-5878-ab1e-185364afe411"
 
 [extensions]
 MultivariateStatsExt = "MultivariateStats"
+EnzymeExt = "Enzyme"
 
 [compat]
 Enzyme = "0.11, 0.12"
@@ -33,4 +34,4 @@ julia = "1.9"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [targets]
-test = ["Test", "MultivariateStats"]
+test = ["Test", "MultivariateStats", "Enzyme"]

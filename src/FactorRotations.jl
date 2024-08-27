@@ -1,7 +1,6 @@
 module FactorRotations
 
 using Folds
-using Enzyme
 using FillArrays
 using LinearAlgebra
 using LogExpFunctions
@@ -57,8 +56,32 @@ If set to `false` (the default), package functions will not log `@info` statemen
 If set to `true`, package functions will provide `@info` statements.
 """
 function setverbosity!(verbose::Bool)
-    @info "Logging is $(verbose ? "enabled" : "disabled") globally."
+    @info "$(@__MODULE__) logging is $(verbose ? "enabled" : "disabled") globally."
     VERBOSITY[] = verbose
+    return nothing
+end
+
+struct AutodiffBackend{B}
+    AutodiffBackend(backend::Symbol) = new{backend}()
+end
+
+const AUTODIFF_BACKEND = Ref{AutodiffBackend}(AutodiffBackend(:Enzyme))
+
+"""
+    set_autodiff_backend(backend::Symbol)
+
+Sets the *automatic differentiation* backend.
+
+Automatic differentiation is used by the fallback `criterion_and_gradient!()` implementation.
+Currently, only `:Enzyme` backend is supported.
+
+Note that to actually enable the differentiation,
+the corresponding autodiff package must be loaded first
+(e.g. `using Enzyme`)
+"""
+function set_autodiff_backend(backend::Symbol)
+    @info "$(@__MODULE__) autodiff backend set to $(backend)."
+    AUTODIFF_BACKEND[] = AutodiffBackend(backend)
     return nothing
 end
 

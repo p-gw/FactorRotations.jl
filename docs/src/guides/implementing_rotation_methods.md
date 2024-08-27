@@ -54,7 +54,13 @@ julia> criterion(MyQuartimax(), ones(10, 2))
 *FactorRotations.jl* will apply [Automatic Differentiation](https://en.wikipedia.org/wiki/Automatic_differentiation) to derive the gradient for your quality criterion
 and use it during rotation optimization.
 
+By default, *FactorRotations.jl* would use [*Enzyme.jl*](https://github.com/EnzymeAD/Enzyme.jl) as an autodiff engine,
+but it could be changed with [`FactorRotations.set_autodiff_backend`](@ref).
+To enable autodiff in *FactorRotations.jl*, the corresponding autodiff package should be loaded first:
+
 ```jldoctest implementing_rotation_methods
+julia> using Enzyme
+
 julia> grad = fill(NaN, 10, 2);
 
 julia> criterion_and_gradient!(grad, MyQuartimax(), ones(10, 2))

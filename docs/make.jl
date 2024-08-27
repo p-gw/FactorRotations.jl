@@ -8,7 +8,7 @@ bibliography =
 DocMeta.setdocmeta!(
     FactorRotations,
     :DocTestSetup,
-    :(using FactorRotations);
+    :(using FactorRotations, Enzyme);
     recursive = true,
 )
 

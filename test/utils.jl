@@ -19,11 +19,19 @@
 
     @testset "setverbosity!" begin
         @test FactorRotations.VERBOSITY[] == false
-        @test_logs (:info, "Logging is disabled globally.") setverbosity!(false)
-        @test_logs (:info, "Logging is enabled globally.") setverbosity!(true)
+        @test_logs (:info, "FactorRotations logging is disabled globally.") setverbosity!(false)
+        @test_logs (:info, "FactorRotations logging is enabled globally.") setverbosity!(true)
         @test FactorRotations.VERBOSITY[] == true
 
         setverbosity!(false)  # disable logging for following tests
+    end
+
+    @testset "set_autodiff_backend" begin
+        @test FactorRotations.AUTODIFF_BACKEND[] == FactorRotations.AutodiffBackend(:Enzyme)
+        FactorRotations.set_autodiff_backend(:ABC)
+        @test FactorRotations.AUTODIFF_BACKEND[] == FactorRotations.AutodiffBackend(:ABC)
+        FactorRotations.set_autodiff_backend(:Enzyme)
+        @test FactorRotations.AUTODIFF_BACKEND[] == FactorRotations.AutodiffBackend(:Enzyme)
     end
 
     @testset "centercols!" begin

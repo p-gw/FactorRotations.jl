@@ -32,10 +32,22 @@ criterion_and_gradient!
 
 OptionalGradient = Union{AbstractMatrix, Nothing}
 
+# fallback method when autodiff backend is not available
+function autodiff_gradient!(_::AutodiffBackend{B}, ∇Q::AbstractMatrix, method::RotationMethod, Λ::AbstractMatrix) where B
+    if B == :Enzyme
+        error("Enzyme.jl autodiff backend is not loaded. Have you run \"using Enzyme\"?")
+    else
+        error("$(B) autodiff backend is not supported.")
+    end
+end
+
+autodiff_gradient!(∇Q::AbstractMatrix, method::RotationMethod, Λ::AbstractMatrix) =
+    autodiff_gradient!(AUTODIFF_BACKEND[], ∇Q, method, Λ)
+
 # fallback method that applies auto-diff to criterion() call
 function criterion_and_gradient!(∇Q::OptionalGradient, method::RotationMethod, Λ::AbstractMatrix)
     if !isnothing(∇Q)
-        gradient!(Reverse, ∇Q, Base.Fix1(criterion, method), Λ)
+        autodiff_gradient!(∇Q, method, Λ)
     else
         error("$(typeof(method)) does not implement neither criterion_and_gradient!(∇Q, ...) nor criterion_and_gradient!(nothing, ...) methods.")
     end
