@@ -1,7 +1,7 @@
 name = "FactorRotations"
 uuid = "be5e9834-f3d9-4b7e-b5ea-d062861d4ac2"
 authors = ["Philipp Gewessler"]
-version = "0.5.0"
+version = "0.5.1"
 
 [deps]
 FillArrays = "1a297f60-69ca-5386-bcde-b61e274b549b"
@@ -17,11 +17,11 @@ Enzyme = "7da242da-08ed-463a-9acd-ee780be4f1d9"
 MultivariateStats = "6f286f6a-111f-5878-ab1e-185364afe411"
 
 [extensions]
-MultivariateStatsExt = "MultivariateStats"
 EnzymeExt = "Enzyme"
+MultivariateStatsExt = "MultivariateStats"
 
 [compat]
-Enzyme = "0.11, 0.12"
+Enzyme = "0.11, 0.12, 0.13"
 FillArrays = "1"
 Folds = "0.2"
 LogExpFunctions = "0.3"
