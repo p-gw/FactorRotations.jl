@@ -81,10 +81,10 @@ end
 A component loss criterion with loss function
 
 ```math
-h(\\lambda) = 1 - \\exp\\left(-\\left(\\frac{\\lambda}{b}\\right)^2\\right)
+h(\\lambda) = 1 - \\exp\\left(-\\left(\\frac{\\lambda}{b}\\right)^2\\right),
 ```
 
-where ``b`` is the bandwidth parameter.
+where ``b`` is the *bandwidth* parameter.
 """
 struct KatzRohlf{F} <: AbstractComponentLoss{Orthogonal}
     bandwidth::Float64
@@ -105,11 +105,11 @@ It has the loss function
 ```math
 h(\\lambda) = \\begin{cases}
     (\\frac{\\lambda}{b})^2&\\text{if } |\\lambda| \\leq b \\\\
-    1 &\\text{if } \\lambda > b
+    1 &\\text{if } \\lambda > b,
 \\end{cases}
 ```
 
-where ``b`` is the bandwidth parameter.
+where ``b`` is the *bandwidth* parameter.
 """
 struct LinearRightConstant{F} <: AbstractComponentLoss{Orthogonal}
     bandwidth::Float64
@@ -128,10 +128,10 @@ The simple concave component loss factor rotation criterion.
 It has the loss function
 
 ```math
-h(\\lambda) = 1 - \\exp(-\\frac{|\\lambda|}{b})
+h(\\lambda) = 1 - \\exp(-\\frac{|\\lambda|}{b}),
 ```
 
-where ``b`` is the bandwidth parameter.
+where ``b`` is the *bandwidth* parameter.
 """
 struct Concave{F} <: AbstractComponentLoss{Oblique}
     bandwidth::Float64
@@ -150,7 +150,7 @@ The Absolmin component loss factor rotation criterion.
 It has the loss function
 
 ```math
-h(\\lambda) = |\\lambda|
+h(\\lambda) = |\\lambda|.
 ```
 """
 struct Absolmin{F} <: AbstractComponentLoss{Oblique}

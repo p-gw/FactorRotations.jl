@@ -1,14 +1,14 @@
 """
     Oblimax(; orthogonal = false)
 
-The Oblimax rotation method.
+The *Oblimax* rotation method.
 
 ## Keyword arguments
 - `orthogonal`: If `orthogonal = true` an orthogonal rotation is performed, an oblique
    rotation otherwise. (default: `false`)
 
 ## Details
-The Oblimax rotation method is equivalent to [`Quartimax`](@ref) for orthogonal rotation.
+The *Oblimax* rotation method is equivalent to [`Quartimax`](@ref) for orthogonal rotation.
 
 ## Examples
 ```jldoctest; filter = r"(\\d*)\\.(\\d{4})\\d+" => s"\\1.\\2"

@@ -1,7 +1,11 @@
 """
     MinimumEntropy()
 
-The Minimum Entropy rotation method.
+The *Minimum Entropy* rotation method.
+
+## See also
+
+[`MinimumEntropyRatio`](@ref)
 """
 struct MinimumEntropy <: RotationMethod{Orthogonal} end
 

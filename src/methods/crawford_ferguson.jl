@@ -1,7 +1,7 @@
 """
     CrawfordFerguson(; kappa, orthogonal = false)
 
-The family of Crawford-Ferguson rotation methods.
+The family of *Crawford-Ferguson* rotation methods.
 
 ## Keyword arguments
 - `kappa`: The parameter determining the rotation criterion (see *Details*).

@@ -1,7 +1,7 @@
 """
     Geomin(epsilon = 0.01)
 
-The Geomin rotation method.
+The *Geomin* rotation method.
 
 ## Keyword arguments
 - `epsilon`: A small constant to deal with zero loadings.

@@ -1,7 +1,7 @@
 """
     PatternSimplicity(; orthogonal = false)
 
-The Pattern Simplicity factor rotation criterion.
+The *Pattern Simplicity* factor rotation criterion.
 
 ## Keyword arguments
 - `orthogonal`: If `orthogonal = true` an orthogonal rotation is performed, an oblique

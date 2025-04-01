@@ -1,10 +1,10 @@
 """
     Biquartimax()
 
-The Biquartimax rotation method.
+The *Biquartimax* rotation method.
 
 ## Details
-The Biquartimax rotation method is a special case of the [`Oblimin`](@ref) rotation with
+The *Biquartimax* rotation method is a special case of the [`Oblimin`](@ref) rotation with
 parameters `gamma = 0.5` and `orthogonal = true`.
 
 ## Examples
