@@ -12,12 +12,12 @@ The family of *Crawford-Ferguson* rotation methods.
 The Crawford-Ferguson family allows both orthogonal and oblique rotation of the
 *p*×*k* factor loading matrix. If orthogonal rotation is performed, Crawford-Ferguson with
 a specific value for `kappa` is equivalent to the following rotation methods:
-- *κ = γ/p*: [`Oblimin(gamma = γ, orthogonal = true)`](@ref Oblimin)
-- *κ = 0*: [`Quartimax`](@ref)
-- *κ = 1/p*: [`Varimax`](@ref)
-- *κ = k/2p*: [`Equamax`](@ref)
-- *κ = (k - 1)/(p + k - 2)*: [`Parsimax`](@ref)
-- *κ = 1*: Factor parsimony
+- *ϰ = γ/p*: [`Oblimin(gamma = γ, orthogonal = true)`](@ref Oblimin)
+- *ϰ = 0*: [`Quartimax`](@ref)
+- *ϰ = 1/p*: [`Varimax`](@ref)
+- *ϰ = k/2p*: [`Equamax`](@ref)
+- *ϰ = (k - 1)/(p + k - 2)*: [`Parsimax`](@ref)
+- *ϰ = 1*: Factor parsimony
 
 ## Examples
 ```jldoctest
