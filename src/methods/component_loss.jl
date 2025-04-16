@@ -1,9 +1,26 @@
 """
     AbstractComponentLoss{RT} <: RotationMethod{RT}
 
-An abstract type representing component loss functions.
+An abstract type representing rotation criterions based
+on component-wise loss functions.
 
-Implementing a custom component loss `T` requires that `T <: AbstractComponentLoss`.
+## Details
+The *component loss* factor rotation minimizes the sum of losses
+across all elements of the factor loading matrix *Λ*:
+
+```math
+Q(Λ) = ∑_{i, j} h(λ_{i,j}).
+```
+
+Custom component loss methods have to be inherited from `AbstractComponentLoss`.
+
+## See also
+
+- [`ComponentLoss`](@ref) for the implementation that accepts a user-defined loss function.
+- [`KatzRohlf`](@ref)
+- [`LinearRightConstant`](@ref)
+- [`Concave`](@ref)
+- [`Absolmin`](@ref)
 """
 abstract type AbstractComponentLoss{RT} <: RotationMethod{RT} end
 
@@ -18,20 +35,12 @@ end
 """
     ComponentLoss(loss::Function; orthogonal = false)
 
-A generic implementation of the component loss factor rotation method.
-`loss` defines the loss function that is applied to the components of the loading matrix.
+A generic implementation of the [component loss](@ref AbstractComponentLoss) factor rotation method
+with the user-defined `loss` function that is applied to each element of the loading matrix.
 
 ## Keyword arguments
 - `orthogonal`: If `orthogonal = true` an orthogonal rotation is performed, an oblique
    rotation otherwise. (default: `false`)
-
-## Details
-The component loss factor rotation applies a loss function to each element of the factor
-loading matrix. Then the following criterion is minimized:
-
-```math
-Q(\\Lambda) = \\sum_i \\sum_j h(\\lambda_{ij})
-```
 
 ## Examples
 ### Quartimax as a component loss
@@ -78,7 +87,7 @@ end
 """
     KatzRohlf(bandwidth)
 
-A component loss criterion with loss function
+A [component loss](@ref AbstractComponentLoss) criterion with the loss function
 
 ```math
 h(\\lambda) = 1 - \\exp\\left(-\\left(\\frac{\\lambda}{b}\\right)^2\\right),
@@ -99,13 +108,13 @@ end
 """
     LinearRightConstant(bandwidth)
 
-The linear right constant component loss factor rotation criterion.
+The linear right constant [component loss](@ref AbstractComponentLoss) factor rotation criterion.
 It has the loss function
 
 ```math
 h(\\lambda) = \\begin{cases}
     (\\frac{\\lambda}{b})^2&\\text{if } |\\lambda| \\leq b \\\\
-    1 &\\text{if } \\lambda > b,
+    1 &\\text{if } |\\lambda| > b,
 \\end{cases}
 ```
 
@@ -124,7 +133,7 @@ end
 """
     Concave(bandwidth = 1)
 
-The simple concave component loss factor rotation criterion.
+The simple concave [component loss](@ref AbstractComponentLoss) factor rotation criterion.
 It has the loss function
 
 ```math
@@ -146,7 +155,7 @@ end
 """
     Absolmin(epsilon)
 
-The Absolmin component loss factor rotation criterion.
+The Absolmin [component loss](@ref AbstractComponentLoss) factor rotation criterion.
 It has the loss function
 
 ```math
