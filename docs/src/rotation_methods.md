@@ -2,8 +2,8 @@
 
 *FactorRotations.jl* implements multiple *orthogonal* and *oblique* rotation methods.
 
-Let us consider the *p*-by-*k* factor loadings matrix *L* for *p* variables and *k* factors.
-Most of the rotation methods aim to find the full-rank *k*-by-*k* rotation matrix *U*,
+Let us consider the *p×k* factor loadings matrix *L* for *p* variables and *k* factors.
+Most of the rotation methods aim to find the full-rank *k×k* rotation matrix *U*,
 so that the rotated loadings matrix *Λ = L × U* optimizes the given *criterion* function *Q(Λ)*.
 
 ## Orthogonal methods
@@ -35,7 +35,7 @@ so that the rotated loadings matrix *Λ = L × U* optimizes the given *criterion
 
 ## Oblique methods
 
-*Oblique* criteria allow the rotation matrix *U* to be an arbitrary full-rank *k*-by-*k* matrix.
+*Oblique* criteria allow the rotation matrix *U* to be an arbitrary full-rank *k×k* matrix.
 
 | criterium                   | reference                            | note                                              |
 | --------------------------- | ------------------------------------ | ------------------------------------------------- |
