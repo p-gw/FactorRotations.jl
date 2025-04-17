@@ -42,4 +42,4 @@ struct Oblimin{T,V} <: RotationMethod{T}
 end
 
 criterion_and_gradient!(∇Q::OptionalGradient, method::Oblimin, Λ::AbstractMatrix{<:Real}) =
-    weighted_sums_criterion_and_gradient!(∇Q, Λ, 1 - method.γ, method.γ / size(Λ, 1))
+    weighted_sums_criterion_and_gradient!(∇Q, Λ, 1, method.γ / size(Λ, 1))

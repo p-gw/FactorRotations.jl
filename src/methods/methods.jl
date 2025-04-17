@@ -107,7 +107,7 @@ rotation_type(::RotationMethod{RT}) where {RT} = RT
     weighted_sums_criterion_and_gradient!(
         [∇Q::AbstractMatrix],
         Λ::AbstractMatrix{<:Real},
-        columns_weight::Number, rows_weight::Number
+        rows_weight::Number, columns_weight::Number
     )
 
 Calculate the value and the gradient of the criterion, which
@@ -115,11 +115,13 @@ is based on the weighted column- and row-wise sums of *Λ²*.
 
 Specifically,
 ```math
-Q(Λ) = \\frac{c}{4} ∑ⱼᵐ \\left(∑ᵢⁿ Λ²_{i,j}\\right)² +
-       \\frac{r}{4} ∑ᵢⁿ \\left(∑ⱼᵐ Λ²_{i,j}\\right)² -
+Q(Λ) = \\frac{r}{4} ∑ᵢⁿ \\left(∑ⱼᵐ Λ²_{i,j}\\right)² +
+       \\frac{c}{4} ∑ⱼᵐ \\left(∑ᵢⁿ Λ²_{i,j}\\right)² +
+       \\frac{1 - c - r}{4} \\left(∑ᵢⁿ∑ⱼᵐ Λ²_{i,j}\\right)² -
        \\frac{1}{4} ∑ᵢⁿ∑ⱼᵐ Λ⁴,
 ```
-where *c* is `columns_weight` and *r* is `rows_weight`.
+where *r* is `rows_weight` (the weight of the row-wise sums of *Λ²* elements),
+and *c* is `columns_weight` (the weight of the column-wise sums of *Λ²* elements).
 
 The gradient is output into `∇Q` matrix, which should have the same dimensions as `Λ`.
 The `∇Q` calculation is skipped if `∇Q ≡ nothing`.
@@ -130,20 +132,26 @@ This function is used by multiple rotation methods, such as [`CrawfordFerguson`]
 function weighted_sums_criterion_and_gradient!(
     ∇Q::Union{Nothing, AbstractMatrix},
     Λ::AbstractMatrix{<:Real},
-    columns_weight::Number, rows_weight::Number
+    rows_weight::Number, columns_weight::Number
 )
     Λsq = !isnothing(∇Q) ? ∇Q : similar(Λ)
     Λsq .= Λ .^ 2
 
-    Λsq_rowsum = sum(Λsq, dims=1)
-    Λsq_colsum = sum(Λsq, dims=2)
+    Λsq_colsum = sum(Λsq, dims=1)
+    Λsq_rowsum = sum(Λsq, dims=2)
+    Λsq_allsum = sum(Λsq_colsum)
+    allsum_weight = 1 - columns_weight - rows_weight
 
-    Q = (columns_weight * sum(abs2, Λsq_colsum) + rows_weight * sum(abs2, Λsq_rowsum) - sum(abs2, Λsq)) / 4
+    Q = (columns_weight * sum(abs2, Λsq_colsum) + rows_weight * sum(abs2, Λsq_rowsum)
+       + allsum_weight * abs2(Λsq_allsum) - sum(abs2, Λsq)) / 4
     if !isnothing(∇Q)
         # ∇Q === Λsq
         # weighted Λ² columns and rows sum at each position - Λ²
         ∇Q .= (columns_weight .* Λsq_colsum) .+
               (rows_weight .* Λsq_rowsum) .- Λsq
+        if allsum_weight != 0
+            ∇Q .+= allsum_weight * Λsq_allsum
+        end
         ∇Q .*= Λ
     end
     return Q
