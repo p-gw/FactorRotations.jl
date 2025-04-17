@@ -4,7 +4,13 @@
 The *Varimax* rotation criterion.
 
 ## Details
-The *Varimax* is an orthogonal rotation method that maximizes the column variances of the loading matrix.
+The *Varimax* is an orthogonal rotation method that maximizes the column variances of
+the loading matrix ``Λ ∈ ℝ^{p × k}``:
+
+```math
+Q(Λ) = -\\frac{p}{4} ∑_{j=1}^{k} \\mathrm{Var}_i(Λ_{i, j}).
+```
+
 It is a special case of the [`Oblimin`](@ref) rotation criterion with parameter
 `gamma = 1`.
 

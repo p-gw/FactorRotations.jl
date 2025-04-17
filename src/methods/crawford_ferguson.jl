@@ -9,9 +9,25 @@ The family of *Crawford-Ferguson* rotation methods.
                 oblique rotation otherwise. (default: `false`)
 
 ## Details
-The Crawford-Ferguson family allows both orthogonal and oblique rotation of the
-*p*×*k* factor loading matrix. If orthogonal rotation is performed, Crawford-Ferguson with
-a specific value for `kappa` is equivalent to the following rotation methods:
+The *Crawford-Ferguson* family allows both orthogonal and oblique rotation of the
+factor loading matrix with the following criterion:
+
+```math
+\\begin{aligned}
+Q_{\\mathrm{CF}}(Λ, ϰ) &=
+    \\frac{1 - ϰ}{4} \\left⟨Λ², Λ²⋅\\left(1^{k×k} - I\\right) \\right⟩ +
+    \\frac{ϰ}{4} \\left⟨Λ², (1^{p×p} - I)⋅Λ²\\right⟩ = \\\\
+  &\\hspace{4em} = -\\frac{1 - ϰ}{4} k ∑_{i=1}^p \\mathrm{Var}(Λ²_{i, \\cdot})
+    - \\frac{ϰ}{4} p ∑_{j=1}^k \\mathrm{Var}(Λ²_{⋅, j}) = \\\\
+  &\\hspace{8em} = \\frac{1 - ϰ}{4} ∑_{i=1}^p \\left(∑_{j=1}^k λ_{i,j}² \\right)²
+    + \\frac{ϰ}{4} ∑_{j=1}^k \\left(∑_{i=1}^p λ_{i,j}² \\right)²
+    - \\frac{1}{4} ∑_{i,j} λ⁴_{i,j}.
+\\end{aligned}
+```
+
+If the rotation is *orthogonal*, the *communalities* (``c_i = ∑_{j=1}^k λ_{i,j}²``)
+are preserved, and, for a specific `kappa`, Crawford-Ferguson criterion becomes equivalent
+to the following rotation methods:
 - *ϰ = γ/p*: [`Oblimin(gamma = γ, orthogonal = true)`](@ref Oblimin)
 - *ϰ = 0*: [`Quartimax`](@ref)
 - *ϰ = 1/p*: [`Varimax`](@ref)
