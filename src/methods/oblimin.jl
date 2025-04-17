@@ -24,6 +24,10 @@ Q_{\\mathrm{oblimin}}(Λ, γ) =&
 \\end{aligned}
 ```
 
+Note that this criterion definition is given for the case of rotations that preserve
+the loading matrix *communalities* (see [oblique rotation](@ref rotation_oblique)).
+It does not apply for arbitrary rotation matrices.
+
 If orthogonal rotation is performed, *Oblimin* is equivalent to the following
 rotation methods given a value for `gamma`:
 - *γ = p×ϰ*: [`CrawfordFerguson(kappa = ϰ, orthogonal = true)`](@ref CrawfordFerguson)
