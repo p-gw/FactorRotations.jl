@@ -8,7 +8,7 @@ so that the rotated loadings matrix *Λ = L × U* optimizes the given *criterion
 
 ## [Orthogonal methods](@id rotation_orthogonal)
 
-*Orthogonal* criteria restrict the rotation matrix *U* to be orthogonal.
+*Orthogonal* criteria restrict the rotation matrix *U* to be orthogonal (``U⋅Uᵀ = I``).
 
 | criterion                     | reference                            | note                                                    |
 | ----------------------------- | ------------------------------------ | ------------------------------------------------------- |
@@ -35,7 +35,10 @@ so that the rotated loadings matrix *Λ = L × U* optimizes the given *criterion
 
 ## [Oblique methods](@id rotation_oblique)
 
-*Oblique* criteria allow the rotation matrix *U* to be an arbitrary full-rank *k×k* matrix.
+*Oblique* criteria allow the rotation matrix *R* to be any full-rank *k×k* matrix.
+*Oblique* rotations do not preserve the orthogonality of the factors.
+To preserve the loadings matrix *communalities* (``c_i = ∑_{j=1}^k L_{i,j}²``),
+the oblique rotation matrix *R* has to satisfy ``\mathrm{diag} (R⋅Rᵀ) = I``.
 
 | criterium                   | reference                            | note                                              |
 | --------------------------- | ------------------------------------ | ------------------------------------------------- |
