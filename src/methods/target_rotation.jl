@@ -8,12 +8,26 @@ The (partial) target rotation criterion.
    rotation otherwise. (default: `false`)
 
 ## Details
-Target rotation rotates a factor loading matrix towards the target matrix, `target`.
-For a fully specified `target` matrix (e.g. all entries in the matrix are numbers), full
-target rotation is performed.
+The method rotates a factor loading matrix ``Λ ∈ ℝ^{p×k}`` towards the `target` matrix
+``T ∈ ℝ^{p×k}``.
+For a fully specified `target` matrix (e.g. all its entries are numbers),
+the method tries to make the rotated loading matrix as similar to the `target`
+as possible:
 
-Partially specified target rotation can be achieved setting the unspecified entries in the
-`target` matrix to `missing`.
+```math
+Q_T(Λ) = \\frac{1}{2} \\left\\| Λ - T \\right\\|^2.
+```
+
+When some of the `target` matrix elements are `missing` instead of being finite numbers,
+the *partially specified* target rotation is performed.
+In that case the criterion becomes
+
+```math
+Q_{WT}(Λ) = \\frac{1}{2} \\left\\| (Λ - T) ⋅ W \\right\\|^2,
+```
+
+where ``W ∈ ℝ^{p×k}`` is a weight matrix that has *1* for non-missing
+elements of *T* and *0* otherwise.
 
 ## Examples
 ### Full target rotation

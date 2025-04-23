@@ -1,7 +1,7 @@
 """
     Simplimax(; m::Int)
 
-The Simplimax rotation method.
+The *Simplimax* rotation method.
 """
 struct Simplimax <: RotationMethod{Oblique}
     m::Int

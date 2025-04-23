@@ -1,10 +1,10 @@
 """
     Biquartimin
 
-The Biquartimin rotation criterion.
+The *Biquartimin* rotation criterion.
 
 # Keyword arguments
-- `orthogonal`: orthogonal: If orthogonal = true an orthogonal rotation is performed, an
+- `orthogonal`: If `true`, an orthogonal rotation is performed, an
                 oblique rotation otherwise. (default: `false`)
 """
 struct Biquartimin{RT} <: RotationMethod{RT}

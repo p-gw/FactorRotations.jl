@@ -2,13 +2,13 @@
 
 *FactorRotations.jl* implements multiple *orthogonal* and *oblique* rotation methods.
 
-Let us consider the *p*-by-*k* factor loadings matrix *L* for *p* variables and *k* factors.
-Most of the rotation methods aim to find the full-rank *k*-by-*k* rotation matrix *U*,
+Let us consider the *p×k* factor loadings matrix *L* for *p* variables and *k* factors.
+Most of the rotation methods aim to find the full-rank *k×k* rotation matrix *U*,
 so that the rotated loadings matrix *Λ = L × U* optimizes the given *criterion* function *Q(Λ)*.
 
-## Orthogonal methods
+## [Orthogonal methods](@id rotation_orthogonal)
 
-*Orthogonal* criteria restrict the rotation matrix *U* to be orthogonal.
+*Orthogonal* criteria restrict the rotation matrix *U* to be orthogonal (``U⋅Uᵀ = I``).
 
 | criterion                     | reference                            | note                                                    |
 | ----------------------------- | ------------------------------------ | ------------------------------------------------------- |
@@ -33,9 +33,12 @@ so that the rotated loadings matrix *Λ = L × U* optimizes the given *criterion
 | [`TargetRotation`](@ref)      |                                      |
 | [`Varimax`](@ref)             | [kaiser1958](@citet)                 | equivalent to `Oblimin(gamma = 1, orthogonal = true)`   |
 
-## Oblique methods
+## [Oblique methods](@id rotation_oblique)
 
-*Oblique* criteria allow the rotation matrix *U* to be an arbitrary full-rank *k*-by-*k* matrix.
+*Oblique* criteria allow the rotation matrix *R* to be any full-rank *k×k* matrix.
+*Oblique* rotations do not preserve the orthogonality of the factors.
+To preserve the loadings matrix *communalities* (``c_i = ∑_{j=1}^k L_{i,j}²``),
+the oblique rotation matrix *R* has to satisfy ``\mathrm{diag} (R⋅Rᵀ) = I``.
 
 | criterium                   | reference                            | note                                              |
 | --------------------------- | ------------------------------------ | ------------------------------------------------- |

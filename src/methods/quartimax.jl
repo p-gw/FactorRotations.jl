@@ -1,10 +1,10 @@
 """
     Quartimax()
 
-The Quartimax rotation criterion.
+The *Quartimax* rotation criterion.
 
 ## Details
-The Quartimax criterion is a special case of the [`Oblimin`](@ref) rotation criterion with
+The *Quartimax* criterion is a special case of the [`Oblimin`](@ref) rotation criterion with
 parameter `gamma = 0`.
 
 ## Examples
