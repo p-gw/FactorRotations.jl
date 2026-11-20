@@ -305,7 +305,7 @@ end
         )
 
         # orthogonal + complete case
-        method = TargetRotation(similar(A), orthogonal = true)
+        method = TargetRotation(zero(A), orthogonal = true)
         @test isorthogonal(method)
         test_criterion_and_gradient(method, A)
 
@@ -316,7 +316,7 @@ end
         test_criterion_and_gradient(method, A)
 
         # oblique + complete case
-        method = TargetRotation(similar(A), orthogonal = false)
+        method = TargetRotation(zero(A), orthogonal = false)
         @test isoblique(method)
         test_criterion_and_gradient(method, A)
 
