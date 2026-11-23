@@ -92,7 +92,7 @@ julia> rotation(L_rotated)
  -0.573158  0.819445
 ```
 
-```@example basic_example;
+```@example basic_example
 julia> factor_correlation(L_rotated)
 ```
 
