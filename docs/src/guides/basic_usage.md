@@ -90,12 +90,10 @@ julia> rotation(L_rotated)
 2×2 Matrix{Float64}:
   0.819445  0.573158
  -0.573158  0.819445
+```
 
+```@example basic_example;
 julia> factor_correlation(L_rotated)
-2×2 Matrix{Float64}:
-  1.0          -1.66533e-16
- -1.66533e-16   1.0
-
 ```
 
 ## In-place rotation
