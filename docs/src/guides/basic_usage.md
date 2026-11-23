@@ -93,7 +93,7 @@ julia> rotation(L_rotated)
 ```
 
 ```@example basic_example
-julia> factor_correlation(L_rotated)
+factor_correlation(L_rotated)
 ```
 
 ## In-place rotation
